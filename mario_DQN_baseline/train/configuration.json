@@ -8,6 +8,5 @@
     "detector_model_path": "../Object_detector/models/YOLOv8-Mario-lvl1-3/weights/best.pt",
     "detector_label_path": "../Object_detector/models/data.yaml",
     "positions_asp": "./asp/positions.lp",
-    "show_asp": "./asp/show.lp",
-    "generate_examples": true
+    "show_asp": "./asp/show.lp"
 }

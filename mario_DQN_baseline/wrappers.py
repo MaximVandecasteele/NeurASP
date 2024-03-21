@@ -1,7 +1,7 @@
 
 from gym_super_mario_bros.actions import RIGHT_ONLY
 from nes_py.wrappers import JoypadSpace
-from gym.wrappers import GrayScaleObservation
+from gym.wrappers import GrayScaleObservation, ResizeObservation
 
 from stable_baselines3_master.stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
 from env_wrappers.SkipFrame import SkipFrame
@@ -13,9 +13,12 @@ def apply_wrappers(env, config):
     # 1. Simplify the controls
     env = JoypadSpace(env, RIGHT_ONLY)
     # 2. There is not much difference between frames, so take every fourth
-    env = SkipFrame(env, skip=config["skip"])  # Num of frames to apply one action to
+    env = SkipFrame(env, skip=config["skip"]) # Num of frames to apply one action to
+
+    env = ResizeObservation(env, shape=84) # Resize frame from 240x256 to 84x84
+
     # 3. convert to greyscale images
-    env = GrayScaleObservation(env,keep_dim=True)
+    env = GrayScaleObservation(env, keep_dim=True)
     # 4. Wrap inside the Dummy Environment. Standard
     env = DummyVecEnv([lambda: env])
     # 5. Stack the frames. Standard

@@ -27,11 +27,10 @@ JoypadSpace.reset = lambda self, **kwargs: self.env.reset(**kwargs)
 ENV_NAME = 'SuperMarioBros-1-1-v0'
 # if you want to see mario play
 DISPLAY = True
-CHECKPOINT_FREQUENCY = 100000
-TOTAL_TIME_STEPS = 4000000
+CHECKPOINT_FREQUENCY = 200000
+TOTAL_TIME_STEPS = 8000000
 CHECKPOINT_DIR = 'train/'
 TENSORBOARD_LOG_DIR = 'logs/tensorboard/'
-SEED = 2
 
 architecture = 1
 
@@ -49,15 +48,14 @@ config = {
     "skip": 4,
     # VecFrameStack
     "stack_size": 4,
-    "learning_rate": 0.000001,
+    # "learning_rate": 0.000001,
     # also 'MlpPolicy (Zorgen voor multidimensionele input in geval van CNN)
-    # "rl_policy": 'CnnPolicy',
-    "rl_policy": 'MlpPolicy',
+    "rl_policy": 'CnnPolicy',
+    # "rl_policy": 'MlpPolicy',
     "detector_model_path": '../Object_detector/models/YOLOv8-Mario-lvl1-3/weights/best.pt',
     "detector_label_path": '../Object_detector/models/data.yaml',
     "positions_asp": './asp/positions.lp',
     "show_asp": './asp/show.lp',
-    "generate_examples": True
 }
 
 # Setup game
@@ -90,31 +88,30 @@ checkpointCallback = CheckpointCallback(check_freq=CHECKPOINT_FREQUENCY, save_pa
 intervalCallback = IntervalCallback(check_freq=1)
 episodeCallback = EpisodeCallback()
 
-# This is the AI model started
-#model = PPO(resources["rl_policy"], env, verbose=1, tensorboard_log=TENSORBOARD_LOG_DIR, learning_rate=resources["learning_rate"], n_steps=resources["n_steps"])
+# This is the AI model
 model = DQN(
     config["rl_policy"],
     env,
     verbose=1,
-    train_freq=8,
+    train_freq=1,
     # How many gradient steps to take after each rollout
     gradient_steps=1,
-    gamma=0.99,
+    learning_rate=0.00025,
+    gamma=0.9,
+    exploration_initial_eps=1.0,
     # fraction of entire training period over which the exploration rate is reduced
-    exploration_fraction=0.1,
+    exploration_fraction=0.9,
     # final value of random action probability
-    exploration_initial_eps=1,
-    exploration_final_eps=0.05,
+    exploration_final_eps=0.1,
     # update the target network every target_update_interval environment steps.
     target_update_interval=10000,
-    learning_starts=100,
+    learning_starts=10000,
     buffer_size=100000,
     batch_size=32,
-    learning_rate=0.00025,
     policy_kwargs=dict(net_arch=[512, 512]),
     tensorboard_log=TENSORBOARD_LOG_DIR,
-    seed=SEED,
     device=device,
+    seed=1,
 )
 
 # Train the AI model, this is where the AI model starts to learn

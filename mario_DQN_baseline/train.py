@@ -32,7 +32,7 @@ TOTAL_TIME_STEPS = 8000000
 CHECKPOINT_DIR = 'train/'
 TENSORBOARD_LOG_DIR = 'logs/tensorboard/'
 
-architecture = 1
+architecture = 0
 
 device = 'cpu'
 device_name = 'cpu'

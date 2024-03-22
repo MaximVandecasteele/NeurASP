@@ -28,6 +28,14 @@ adjacent(ground(XMIN1,XMAX1,YMIN1,YMAX1), ground(XMIN2,XMAX2,YMIN2,YMAX2)) :- gr
 
 
 
-%left(O1,O2) :- xmin(O1, X1), xmin(O2, X2), O1 != O2, X1 < X2.
-%right(O1,O2) :- xmin(O1, X1), xmin(O2, X2), O1 != O2, X1 > X2.
+object(1, (XMIN + XMAX) / 2, (YMIN + YMAX) /2) :- mario(XMIN,XMAX,YMIN,YMAX).
+object(3, (XMIN + XMAX) / 2, (YMIN + YMAX) /2) :- enemy(XMIN,XMAX,YMIN,YMAX).
+
+
+
+object(2, (XMIN + XMAX) / 2, (YMIN + YMAX) /2) :- platform(XMIN,XMAX,YMIN,YMAX).
+object(4, (XMIN + XMAX) / 2, (YMIN + YMAX) /2) :- hole(XMIN,XMAX,YMIN,YMAX).
+
+
+
 

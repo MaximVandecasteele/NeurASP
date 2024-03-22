@@ -33,8 +33,8 @@ def apply_ASP_wrappers(env, config, detector, positioner):
     env = SkipFrame(env, skip=config["skip"])  # Num of frames to apply one action to
     # 3. Detect, position and reduce dimension
     env = DetectObjects(env, detector=detector)  # intercept image and convert to object positions
-    env = PositionObjects(env, positioner=positioner)  # intercept image and convert to object positions
-    env = TransformAndFlatten(env, dim=config["observation_dim"])
+    # env = PositionObjects(env, positioner=positioner)  # intercept image and convert to object positions
+    env = TransformAndFlatten(env, positioner, dim=config["observation_dim"])
     # 4. Wrap inside the Dummy Environment
     env = DummyVecEnv([lambda: env])
     # 5. Stack the frames

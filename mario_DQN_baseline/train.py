@@ -8,6 +8,7 @@ import torch
 from gym.vector.utils import spaces
 from nes_py.wrappers import JoypadSpace
 from stable_baselines3_master.stable_baselines3.common.evaluation import evaluate_policy
+from stable_baselines3_master.stable_baselines3.common import env_checker
 
 from mario_DQN_baseline.callback import CheckpointCallback, IntervalCallback, EpisodeCallback
 from mario_DQN_baseline.symbolic_components.detector import Detector
@@ -32,7 +33,7 @@ TOTAL_TIME_STEPS = 8000000
 CHECKPOINT_DIR = 'train/'
 TENSORBOARD_LOG_DIR = 'logs/tensorboard/'
 
-architecture = 1
+architecture = 0
 
 device = 'cpu'
 device_name = 'cpu'
@@ -43,7 +44,7 @@ if torch.cuda.is_available():
 config = {
     "device": device_name,
     # input dimensions of observation (64 objects of 5 characteristics, class, xmin, xmax, ymin, ymax)
-    "observation_dim": 5*64,
+    "observation_dim": (15, 16, 1),
     # amount of frames to skip (skipframe)
     "skip": 4,
     # VecFrameStack
@@ -71,7 +72,12 @@ if architecture == 0:
     print(env.observation_space)
     env = apply_wrappers(env, config)
 elif architecture == 1:
-    env.observation_space = spaces.Box(low=-1, high=1024, shape=(config["observation_dim"],), dtype=np.float32)
+    y, x, chann = config["observation_dim"]
+    # env.observation_space = spaces.Box(low=-1, high=1024, shape=(config["observation_dim"],), dtype=np.float32)
+    env.observation_space = spaces.Box(low=0, high=255, shape=(y,x, chann), dtype=np.int8)
+
+
+
     print(env.observation_space)
     # hack the observation space of the environment. We reduce to a single vector, but the environment is expecting
     # a colored image. This can be overridden by setting the observation space manually

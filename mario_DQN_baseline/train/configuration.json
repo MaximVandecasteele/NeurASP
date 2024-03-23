@@ -1,6 +1,10 @@
 {
     "device": "cpu",
-    "observation_dim": 320,
+    "observation_dim": [
+        15,
+        16,
+        1
+    ],
     "skip": 4,
     "stack_size": 4,
     "rl_policy": "CnnPolicy",

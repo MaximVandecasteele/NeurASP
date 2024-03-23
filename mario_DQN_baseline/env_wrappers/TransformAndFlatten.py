@@ -23,7 +23,7 @@ class TransformAndFlatten(ObservationWrapper):
 
         cell_list = self.positioner.position(observation)
 
-        return self.convert_ASP_cells_to_matrix(cell_list)
+        return self.convert_ASP_cells_to_matrix(cell_list, self.dim)
 
 
 
@@ -44,9 +44,9 @@ class TransformAndFlatten(ObservationWrapper):
         #
         # return padded
 
-    def convert_ASP_cells_to_matrix(self, cell_list: list) -> ndarray:
+    def convert_ASP_cells_to_matrix(self, cell_list: list, dim) -> ndarray:
 
-        matrix = np.zeros((15, 16), dtype=int)
+        matrix = np.zeros(dim, dtype=int)
 
         for cell in cell_list:
             row, col, val = map(int, cell.strip('cell().').split(','))

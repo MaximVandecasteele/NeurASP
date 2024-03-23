@@ -3,6 +3,9 @@ from gym_super_mario_bros.actions import RIGHT_ONLY
 from nes_py.wrappers import JoypadSpace
 from gym.wrappers import GrayScaleObservation, ResizeObservation
 
+from gym.vector.utils import spaces
+import numpy as np
+
 from stable_baselines3_master.stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
 from env_wrappers.SkipFrame import SkipFrame
 from env_wrappers.DetectObjects import DetectObjects
@@ -31,6 +34,7 @@ def apply_ASP_wrappers(env, config, detector, positioner):
     env = JoypadSpace(env, RIGHT_ONLY)
     # 2. There is not much difference between frames, so take every fourth
     env = SkipFrame(env, skip=config["skip"])  # Num of frames to apply one action to
+
     # 3. Detect, position and reduce dimension
     env = DetectObjects(env, detector=detector)  # intercept image and convert to object positions
     # env = PositionObjects(env, positioner=positioner)  # intercept image and convert to object positions

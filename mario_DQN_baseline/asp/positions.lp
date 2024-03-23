@@ -52,7 +52,8 @@ cell(Y1 + 1, X1 + 1, C) :- object(C,X,Y), X1 = X / 16, X2 = X \ 16, X2 = 0,
                                    Y1 = Y / 16, Y2 = Y \ 16, Y2 = 0.
 
 % if the center of a cell is within a platform or a hole, then the cell is either a platform or a hole.
-% if a center falls on the bounding box of platform, whole or pipe, then the region is enlarged to capture the entire bounding box
+% if a center falls on the bounding box of platform, hole or pipe, then the region is enlarged to capture the entire
+% bounding box, this will not work, as this will create overlapping cells
 
 cell(R,C,2) :- platform(XMIN,XMAX,YMIN,YMAX), center_cell(R,C,XC,YC), XC >= XMIN, XC <= XMAX, YC <= YMAX, YC >= YMIN.
 

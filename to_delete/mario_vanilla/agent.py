@@ -14,13 +14,13 @@ class Agent:
                  epsilon=1.0, 
                  eps_decay=0.99999975, 
                  eps_min=0.1, 
-                 replay_buffer_capacity=100_000, 
+                 replay_buffer_capacity=80_000,
                  batch_size=32, 
                  sync_network_rate=10000):
         
         self.num_actions = num_actions
         self.learn_step_counter = 0
-
+        self.loss_score = 0
         # Hyperparameters
         self.lr = lr
         self.gamma = gamma
@@ -102,8 +102,9 @@ class Agent:
         # If done is true, then 1 - done is 0, so the part after the plus sign (representing the future rewards) is 0
         target_q_values = rewards + self.gamma * target_q_values * (1 - dones.float())
 
-        loss = self.loss(predicted_q_values, target_q_values)
-        loss.backward()
+        self.loss_score = self.loss(predicted_q_values, target_q_values)
+
+        self.loss_score.backward()
         self.optimizer.step()
 
         self.learn_step_counter += 1

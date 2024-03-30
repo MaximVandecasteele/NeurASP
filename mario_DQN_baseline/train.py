@@ -27,8 +27,8 @@ JoypadSpace.reset = lambda self, **kwargs: self.env.reset(**kwargs)
 
 ENV_NAME = 'SuperMarioBros-1-1-v0'
 # if you want to see mario play
-DISPLAY = True
-CHECKPOINT_FREQUENCY = 200000
+DISPLAY = False
+CHECKPOINT_FREQUENCY = 100000
 TOTAL_TIME_STEPS = 8000000
 CHECKPOINT_DIR = 'train/'
 TENSORBOARD_LOG_DIR = 'logs/tensorboard/'
@@ -37,7 +37,10 @@ architecture = 0
 
 device = 'cpu'
 device_name = 'cpu'
-if torch.cuda.is_available():
+if torch.backends.mps.is_available():
+    mps_device = torch.device(device)
+    device = 'mps'
+elif torch.cuda.is_available():
     device_name = torch.cuda.get_device_name(0)
     device = 'cuda'
 
@@ -75,9 +78,6 @@ elif architecture == 1:
     y, x, chann = config["observation_dim"]
     # env.observation_space = spaces.Box(low=-1, high=1024, shape=(config["observation_dim"],), dtype=np.float32)
     env.observation_space = spaces.Box(low=0, high=255, shape=(y,x, chann), dtype=np.int8)
-
-
-
     print(env.observation_space)
     # hack the observation space of the environment. We reduce to a single vector, but the environment is expecting
     # a colored image. This can be overridden by setting the observation space manually
@@ -106,7 +106,7 @@ model = DQN(
     gamma=0.9,
     exploration_initial_eps=1.0,
     # fraction of entire training period over which the exploration rate is reduced
-    exploration_fraction=0.9,
+    exploration_fraction=0.2,
     # final value of random action probability
     exploration_final_eps=0.1,
     # update the target network every target_update_interval environment steps.

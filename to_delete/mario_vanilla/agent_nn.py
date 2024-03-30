@@ -29,8 +29,18 @@ class AgentNN(nn.Module):
         if freeze:
             self._freeze()
         
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.device = 'mps' if torch.backends.mps.is_available() else 'cpu'
         self.to(self.device)
+
+    # device = 'cpu'
+    # device_name = 'cpu'
+    # if torch.backends.mps.is_available():
+    #     mps_device = torch.device(device)
+    #     device = 'mps'
+    # elif torch.cuda.is_available():
+    #     device_name = torch.cuda.get_device_name(0)
+    #     device = 'cuda'
+
 
     def forward(self, x):
         return self.network(x)

@@ -8,8 +8,8 @@ from DQNAsp import Dqn_asp
 from gym.vector.utils import spaces
 from nes_py.wrappers import JoypadSpace
 from wrappers import apply_ASP_wrappers
-from mario_vanilla import Positioner
-from mario_vanilla import Detector
+from mario_vanilla.symbolic_components.positioner import Positioner
+from mario_vanilla.symbolic_components.detector import Detector
 
 # nes_py bugfix
 JoypadSpace.reset = lambda self, **kwargs: self.env.reset(**kwargs)
@@ -42,9 +42,8 @@ config = {
 }
 
 ENV_NAME = 'SuperMarioBros-1-1-v0'
-SHOULD_TRAIN = True
 # if you want to see mario play
-DISPLAY = True
+DISPLAY = False
 CKPT_SAVE_INTERVAL = 1000
 NUM_OF_EPISODES = 50_000
 
@@ -74,10 +73,8 @@ env.reset()
 # next_state, reward, done, trunc, info = env.step(action=0)
 
 file_path = 'log/output_B2.csv'
+os.makedirs(file_path, exist_ok=True)
 
-if not os.path.isfile(file_path):
-    with open(file_path, mode='w', newline='') as file:
-        pass  # Create an empty file
 # Appending to CSV
 with open(file_path, mode='a+', newline='') as file:
     writer = csv.writer(file)

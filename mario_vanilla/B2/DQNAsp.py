@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from DQN_asp_nn import Dqn_asp_nn
+from mario_vanilla.B2.DQN_asp_nn import Dqn_asp_nn
 
 from tensordict import TensorDict
 from torchrl.data import TensorDictReplayBuffer, LazyMemmapStorage

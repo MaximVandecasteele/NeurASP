@@ -43,22 +43,25 @@ NUM_OF_EPISODES = 50_000
 env = gym_super_mario_bros.make(ENV_NAME, render_mode='human' if DISPLAY else 'rgb', apply_api_compatibility=True)
 # env = JoypadSpace(env, RIGHT_ONLY)
 
+# TODO folder creation
 model_path = os.path.join("models", get_current_date_time_string())
 os.makedirs(model_path, exist_ok=True)
+# TODO observation space change
 # 3. Apply the decorator chain
 print(env.observation_space)
+# TODO different wrappers
 env = apply_wrappers(env, config)
 
+# TODO different DQN
 Dqn = Dqn_vanilla(input_dims=env.observation_space.shape, num_actions=env.action_space.n)
 
 env.reset()
 # next_state, reward, done, trunc, info = env.step(action=0)
 
+# TODO different log file
 file_path = 'log/output_B1.csv'
+os.makedirs(file_path, exist_ok=True)
 
-if not os.path.isfile(file_path):
-    with open(file_path, mode='w', newline='') as file:
-        pass  # Create an empty file
 # Appending to CSV
 with open(file_path, mode='a+', newline='') as file:
     writer = csv.writer(file)

@@ -119,7 +119,7 @@ for i in range(NUM_OF_EPISODES):
     data = [[i, total_reward, agent.loss_score.item(), agent.learn_step_counter, agent.epsilon, len(agent.replay_buffer)]]
     print("Total reward:", total_reward, "Loss:", agent.loss_score.item(), "Learn step counter:", agent.learn_step_counter, "Epsilon:", agent.epsilon, "Size of replay buffer:", len(agent.replay_buffer))
 
-    file_path = '../B1/log/output_B1.csv'
+    file_path = f'../B1/log/output_B1.csv'
 
     if not os.path.isfile(file_path):
         with open(file_path, mode='w', newline='') as file:

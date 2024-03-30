@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from DQN_vanilla_nn import Dqn_vanilla_nn
+from mario_vanilla.B1.DQN_vanilla_nn import Dqn_vanilla_nn
 
 from tensordict import TensorDict
 from torchrl.data import TensorDictReplayBuffer, LazyMemmapStorage

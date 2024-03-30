@@ -54,7 +54,7 @@ def apply_ASP_wrappers(env, config, detector, positioner):
     # env = DummyVecEnv([lambda: env])
 
     # 5. Stack the frames
-    env = FrameStack(env, num_stack=4, lz4_compress=True)
+    env = FrameStack(env, num_stack=config['stack_size'], lz4_compress=True)
     # env = VecFrameStack(env, config["stack_size"], channels_order='last')
 
 

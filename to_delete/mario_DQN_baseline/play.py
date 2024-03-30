@@ -6,7 +6,7 @@ import torch
 from gym.vector.utils import spaces
 from nes_py.wrappers import JoypadSpace
 
-from mario_DQN_baseline.symbolic_components.detector import Detector
+from to_delete.mario_DQN_baseline.symbolic_components.detector import Detector
 from mario_DQN_baseline.wrappers import apply_wrappers
 # Import DQN for algos
 from stable_baselines3_master.stable_baselines3 import PPO, DQN
@@ -26,7 +26,7 @@ elif torch.cuda.is_available():
     device = 'cuda'
 
 # load the configuration belonging to the model we want to use
-with open('./train/configuration.json', 'r') as file:
+with open('train/configuration.json', 'r') as file:
     config = json.load(file)
 
 

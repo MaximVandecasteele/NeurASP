@@ -1,14 +1,15 @@
 import torch
 import numpy as np
-from agent_nn import AgentNN
+from DQN_nn import Dqn_nn
 
 from tensordict import TensorDict
 from torchrl.data import TensorDictReplayBuffer, LazyMemmapStorage
 
-class Agent:
+class Dqn:
     def __init__(self, 
                  input_dims, 
-                 num_actions, 
+                 num_actions,
+                 asp,
                  lr=0.00025, 
                  gamma=0.9, 
                  epsilon=1.0, 
@@ -17,7 +18,7 @@ class Agent:
                  replay_buffer_capacity=80_000,
                  batch_size=32, 
                  sync_network_rate=10000):
-        
+        self.asp = asp
         self.num_actions = num_actions
         self.learn_step_counter = 0
         self.loss_score = 0
@@ -31,8 +32,8 @@ class Agent:
         self.sync_network_rate = sync_network_rate
 
         # Networks
-        self.online_network = AgentNN(input_dims, num_actions)
-        self.target_network = AgentNN(input_dims, num_actions, freeze=True)
+        self.online_network = Dqn_nn(input_dims, num_actions, asp)
+        self.target_network = Dqn_nn(input_dims, num_actions, asp, freeze=True)
 
         # Optimizer and loss
         self.optimizer = torch.optim.Adam(self.online_network.parameters(), lr=self.lr)

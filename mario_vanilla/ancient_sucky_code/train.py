@@ -5,7 +5,7 @@ import os
 import csv
 from utils import *
 from gym_super_mario_bros.actions import RIGHT_ONLY
-from agent import Agent
+from DQN import Dqn
 from gym.vector.utils import spaces
 from nes_py.wrappers import JoypadSpace
 from wrappers import apply_wrappers, apply_ASP_wrappers
@@ -15,8 +15,7 @@ from symbolic_components.detector import Detector
 # nes_py bugfix
 JoypadSpace.reset = lambda self, **kwargs: self.env.reset(**kwargs)
 
-model_path = os.path.join("models", get_current_date_time_string())
-os.makedirs(model_path, exist_ok=True)
+
 
 
 device = 'cpu'
@@ -36,14 +35,14 @@ else:
 config = {
     "device": device_name,
     # input dimensions of observation (64 objects of 5 characteristics, class, xmin, xmax, ymin, ymax)
-    "observation_dim": (15, 16, 1),
+    "observation_dim": (16, 16),
     # amount of frames to skip (skipframe)
     "skip": 4,
     # VecFrameStack
     "stack_size": 4,
     # "learning_rate": 0.000001,
     # also 'MlpPolicy (Zorgen voor multidimensionele input in geval van CNN)
-    "rl_policy": 'CnnPolicy',
+    #"rl_policy": 'CnnPolicy',
     # "rl_policy": 'MlpPolicy',
     "detector_model_path": '../Object_detector/models/YOLOv8-Mario-lvl1-3/weights/best.pt',
     "detector_label_path": '../Object_detector/models/data.yaml',
@@ -54,39 +53,46 @@ config = {
 ENV_NAME = 'SuperMarioBros-1-1-v0'
 SHOULD_TRAIN = True
 # if you want to see mario play
-DISPLAY = True
+DISPLAY = False
 CKPT_SAVE_INTERVAL = 1000
 NUM_OF_EPISODES = 50_000
 
-architecture = 0
+architecture = 1
 
 # 2. Create the base environment
 env = gym_super_mario_bros.make(ENV_NAME, render_mode='human' if DISPLAY else 'rgb', apply_api_compatibility=True)
 # env = JoypadSpace(env, RIGHT_ONLY)
 
+asp = False
+
 if architecture == 0:
+    asp = False
+    model_path = os.path.join('../B1', "models", get_current_date_time_string())
+    os.makedirs(model_path, exist_ok=True)
     # 3. Apply the decorator chain
     print(env.observation_space)
     env = apply_wrappers(env, config)
 elif architecture == 1:
+    asp = True
+    model_path = os.path.join('../B2', "models", get_current_date_time_string())
+    os.makedirs(model_path, exist_ok=True)
     # Create the object detector. This is a YOLO8 model
     detector = Detector(config)
     positioner = Positioner(config)
-    y, x, chann = config["observation_dim"]
+    y, x = config["observation_dim"]
     # env.observation_space = spaces.Box(low=-1, high=1024, shape=(config["observation_dim"],), dtype=np.float32)
-    env.observation_space = spaces.Box(low=0, high=255, shape=(y,x, chann), dtype=np.int8)
+    env.observation_space = spaces.Box(low=0, high=10, shape=(y,x), dtype=np.int8)
     print(env.observation_space)
     # hack the observation space of the environment. We reduce to a single vector, but the environment is expecting
     # a colored image. This can be overridden by setting the observation space manually
     env = apply_ASP_wrappers(env, config, detector, positioner)
 
-
-agent = Agent(input_dims=env.observation_space.shape, num_actions=env.action_space.n)
+agent = Dqn(input_dims=env.observation_space.shape, num_actions=env.action_space.n, asp=asp)
 
 if not SHOULD_TRAIN:
     folder_name = ""
     ckpt_name = ""
-    agent.load_model(os.path.join("models", folder_name, ckpt_name))
+    agent.load_model(os.path.join("../B1/models", folder_name, ckpt_name))
     agent.epsilon = 0.2
     agent.eps_min = 0.0
     agent.eps_decay = 0.0
@@ -113,7 +119,7 @@ for i in range(NUM_OF_EPISODES):
     data = [[i, total_reward, agent.loss_score.item(), agent.learn_step_counter, agent.epsilon, len(agent.replay_buffer)]]
     print("Total reward:", total_reward, "Loss:", agent.loss_score.item(), "Learn step counter:", agent.learn_step_counter, "Epsilon:", agent.epsilon, "Size of replay buffer:", len(agent.replay_buffer))
 
-    file_path = 'models/output_B1.csv'
+    file_path = '../B1/log/output_B1.csv'
 
     if not os.path.isfile(file_path):
         with open(file_path, mode='w', newline='') as file:

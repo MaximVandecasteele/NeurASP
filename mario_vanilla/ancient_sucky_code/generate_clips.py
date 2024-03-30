@@ -1,7 +1,7 @@
 import gym_super_mario_bros
 from gym_super_mario_bros.actions import RIGHT_ONLY
 from nes_py.wrappers import JoypadSpace
-from agent import Agent
+from DQN import Dqn
 
 from gym import Wrapper
 from gym.wrappers import GrayScaleObservation, ResizeObservation, FrameStack
@@ -52,7 +52,7 @@ env = gym_super_mario_bros.make(ENV_NAME, render_mode='rgb_array', apply_api_com
 env = JoypadSpace(env, RIGHT_ONLY)
 env = apply_wrappers(env)
 
-agent = Agent(input_dims=env.observation_space.shape, num_actions=env.action_space.n)
+agent = Dqn(input_dims=env.observation_space.shape, num_actions=env.action_space.n)
 
 # agent.load_model("models/folder_name/ckpt_name")
 

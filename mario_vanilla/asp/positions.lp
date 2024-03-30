@@ -94,6 +94,7 @@ cell(R,C,5) :- pipe(XMIN,XMAX,YMIN,YMAX), center_cell(R,C,XC,YC), XC >= XMIN, XC
 
 cell(R,C,6) :- wall(XMIN,XMAX,YMIN,YMAX), center_cell(R,C,XC,YC), XC >= XMIN, XC <= XMAX, YC <= YMAX, YC >= YMIN.
 
-
-
+% ensure that no cells are out of bounds
+:- cell(_,16,_).
+:- cell(15,_,_).
 

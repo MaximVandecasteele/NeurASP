@@ -7,13 +7,11 @@ import numpy as np
 import torch
 from gym.vector.utils import spaces
 from nes_py.wrappers import JoypadSpace
-from stable_baselines3_master.stable_baselines3.common.evaluation import evaluate_policy
-from stable_baselines3_master.stable_baselines3.common import env_checker
 
 from mario_DQN_baseline.callback import CheckpointCallback, IntervalCallback, EpisodeCallback
-from mario_DQN_baseline.symbolic_components.detector import Detector
+from to_delete.mario_DQN_baseline.symbolic_components.detector import Detector
 from mario_DQN_baseline.wrappers import apply_wrappers, apply_ASP_wrappers
-from mario_DQN_baseline.symbolic_components.positioner import Positioner
+from to_delete.mario_DQN_baseline.symbolic_components.positioner import Positioner
 # Import DQN for algos
 from stable_baselines3_master.stable_baselines3 import DQN
 
@@ -33,7 +31,7 @@ TOTAL_TIME_STEPS = 8000000
 CHECKPOINT_DIR = 'train/'
 TENSORBOARD_LOG_DIR = 'logs/tensorboard/'
 
-architecture = 0
+architecture = 1
 
 device = 'cpu'
 device_name = 'cpu'

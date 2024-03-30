@@ -3,7 +3,7 @@ from gym_super_mario_bros.actions import RIGHT_ONLY
 from nes_py.wrappers import JoypadSpace
 
 from wrappers import apply_wrappers
-from agent import Agent
+from DQN import Dqn
 
 ENV_NAME = 'SuperMarioBros-1-1-v0'
 SHOULD_TRAIN = True
@@ -16,7 +16,7 @@ env = JoypadSpace(env, RIGHT_ONLY)
 
 env = apply_wrappers(env)
 
-agent = Agent(input_dims=env.observation_space.shape, num_actions=env.action_space.n)
+agent = Dqn(input_dims=env.observation_space.shape, num_actions=env.action_space.n)
 
 for i in range(NUM_OF_EPISODES):
     done = False

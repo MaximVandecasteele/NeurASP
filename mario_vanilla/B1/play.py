@@ -1,10 +1,10 @@
 import torch
 import gym_super_mario_bros
 import os
-from utils import *
-from DQNVanilla import Dqn_vanilla
+from mario_vanilla.utils import *
+from mario_vanilla.DQN import Dqn
 from nes_py.wrappers import JoypadSpace
-from wrappers import apply_wrappers
+from mario_vanilla.wrappers import apply_wrappers
 
 # nes_py bugfix
 JoypadSpace.reset = lambda self, **kwargs: self.env.reset(**kwargs)
@@ -37,39 +37,31 @@ ENV_NAME = 'SuperMarioBros-1-1-v0'
 SHOULD_TRAIN = True
 # if you want to see mario play
 DISPLAY = True
-CKPT_SAVE_INTERVAL = 1000
-NUM_OF_EPISODES = 50_000
 
-architecture = 0
+NUM_OF_EPISODES = 50
 
 # 2. Create the base environment
 env = gym_super_mario_bros.make(ENV_NAME, render_mode='human' if DISPLAY else 'rgb', apply_api_compatibility=True)
-# env = JoypadSpace(env, RIGHT_ONLY)
-
-asp = False
 
 
 asp = False
-model_path = os.path.join('B1', "models", get_current_date_time_string())
-os.makedirs(model_path, exist_ok=True)
 # 3. Apply the decorator chain
 print(env.observation_space)
 env = apply_wrappers(env, config)
 
 
-agent = Dqn_vanilla(input_dims=env.observation_space.shape, num_actions=env.action_space.n, asp=asp)
+agent = Dqn(input_dims=env.observation_space.shape, num_actions=env.action_space.n, asp=asp)
 
 
 folder_name = ""
 ckpt_name = ""
 # agent.load_model(os.path.join("models", folder_name, ckpt_name))
-agent.load_model('/Users/maximvandecasteele/PycharmProjects/NeurASP/mario_vanilla/models/B1/2024-03-25-15_56_15/model_50000_iter.pt')
-agent.epsilon = 0.2
+agent.load_model('/Users/maximvandecasteele/PycharmProjects/NeurASP/mario_vanilla/B1/models/model_50000_iter.pt')
+agent.epsilon = 0.15
 agent.eps_min = 0.0
 agent.eps_decay = 0.0
 
-env.reset()
-# next_state, reward, done, trunc, info = env.step(action=0)
+
 
 for i in range(NUM_OF_EPISODES):
     print("Episode:", i)

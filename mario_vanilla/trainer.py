@@ -3,12 +3,14 @@ import numpy as np
 import gym_super_mario_bros
 import os
 import csv
+import time
 from utils import *
 from B1.DQNVanilla import Dqn_vanilla
 from B2.DQNAsp import Dqn_asp
+from DQN import Dqn
 
 from gym.vector.utils import spaces
-from nes_py.wrappers import JoypadSpace
+
 from wrappers import apply_wrappers, apply_ASP_wrappers
 from mario_vanilla.symbolic_components.positioner import Positioner
 from mario_vanilla.symbolic_components.detector import Detector
@@ -66,10 +68,11 @@ class Trainer(object):
 
     @staticmethod
     def build_dqn(input_dim, action_space, asp):
-        if asp:
-            return Dqn_asp(input_dims=input_dim, num_actions=action_space)
-        else:
-            return Dqn_vanilla(input_dims=input_dim, num_actions=action_space)
+        return Dqn(input_dims=input_dim, num_actions=action_space, asp=asp)
+        # if asp:
+        #     return Dqn_asp(input_dims=input_dim, num_actions=action_space)
+        # else:
+        #     return Dqn_vanilla(input_dims=input_dim, num_actions=action_space)
 
     @staticmethod
     def train(num_episodes, save_interval, exp_name, env, dqn, model_path, log_path):
@@ -81,13 +84,15 @@ class Trainer(object):
 
         log_file = os.path.join(log_path, f"output_{exp_name}.csv")
 
+        runtime = 0
+
         if not os.path.isfile(log_file):
             with open(log_file, mode='w', newline='') as file:
                 pass  # Create an empty file
         # Appending to CSV
         with open(log_file, mode='a+', newline='') as file:
             writer = csv.writer(file)
-
+            start_time = time.time()
             for i in range(num_episodes):
                 print("Episode:", i)
                 done = False
@@ -112,5 +117,17 @@ class Trainer(object):
 
                 if (i + 1) % save_interval == 0:
                     dqn.save_model(os.path.join(model_path, "model_" + str(i + 1) + "_iter.pt"))
+            stop_time = time.time()
+            print("Total training time:", stop_time - start_time, "")
 
         env.close()
+
+        minutes, seconds = divmod(runtime, 60)
+        hours, minutes = divmod(minutes, 60)
+        days, hours = divmod(hours, 24)
+
+        # Write the runtime to a text file
+        with open('runtime.txt', 'w') as f:
+            f.write("Runtime: {} total, {} days, {} hours, {} minutes, {} seconds".format(int(runtime), int(days),
+                                                                                          int(hours), int(minutes),
+                                                                                          int(seconds)))

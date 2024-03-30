@@ -68,18 +68,25 @@ center_cell(R,C, (C * 16) + 8, (R * 16) + 8) :- R = 0..13, C = 0..15.
 
 % place the game objects (moving agents) into a cell (16 x 16). (What if Mario becomes bigger by accident?)
 % When center falls on cell border, X-wise they are snapped to the right, Y-wise they are snapped downwards
+% can only be within 15*16 cell grid
 
 cell(Y1, X1, C) :- object(C,X,Y), X1 = X / 16, X2 = X \ 16, X2 != 0,
-                                    Y1 = Y / 16, Y2 = Y \ 16, Y2 != 0.
+                                    Y1 = Y / 16, Y2 = Y \ 16, Y2 != 0,
+                                    Y1 < 16, Y1 >= 0, X1 >= 0, X1 < 15.
 
 cell(Y1, X1 + 1, C) :- object(C,X,Y), X1 = X / 16, X2 = X \ 16, X2 = 0,
-                                    Y1 = Y / 16, Y2 = Y \ 16, Y2 != 0.
+                                    Y1 = Y / 16, Y2 = Y \ 16, Y2 != 0,
+                                    Y1 < 16, Y1 >= 0, X1 >= 0, X1 < 15.
 
 cell(Y1 + 1, X1, C) :- object(C,X,Y), X1 = X / 16, X2 = X \ 16, X2 != 0,
-                                    Y1 = Y / 16, Y2 = Y \ 16, Y2 = 0.
+                                    Y1 = Y / 16, Y2 = Y \ 16, Y2 = 0,
+                                    Y1 < 16, Y1 >= 0, X1 >= 0, X1 < 15.
 
 cell(Y1 + 1, X1 + 1, C) :- object(C,X,Y), X1 = X / 16, X2 = X \ 16, X2 = 0,
-                                   Y1 = Y / 16, Y2 = Y \ 16, Y2 = 0.
+                                   Y1 = Y / 16, Y2 = Y \ 16, Y2 = 0,
+                                   Y1 < 16, Y1 >= 0, X1 >= 0, X1 < 15.
+
+
 
 % if the center of a cell is within a platform or a hole, then the cell is either a platform or a hole.
 % if a center falls on the bounding box of platform, hole, wall or pipe, then the region is enlarged to capture the entire
@@ -94,7 +101,10 @@ cell(R,C,5) :- pipe(XMIN,XMAX,YMIN,YMAX), center_cell(R,C,XC,YC), XC >= XMIN, XC
 
 cell(R,C,6) :- wall(XMIN,XMAX,YMIN,YMAX), center_cell(R,C,XC,YC), XC >= XMIN, XC <= XMAX, YC <= YMAX, YC >= YMIN.
 
-% ensure that no cells are out of bounds
-:- cell(_,16,_).
-:- cell(15,_,_).
 
+%mario(110,126,167,183).
+%ground(0,254,207,240).
+%goomba(232,249,192,208).
+%pipe(251,255,143,206).
+
+%#show cell/3.

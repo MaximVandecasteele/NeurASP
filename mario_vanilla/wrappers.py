@@ -9,9 +9,9 @@ from gym.vector.utils import spaces
 import numpy as np
 
 from stable_baselines3_master.stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
-from env_wrappers.SkipFrame import SkipFrame
-from env_wrappers.DetectObjects import DetectObjects
-from env_wrappers.TransformAndFlatten import TransformAndFlatten
+from mario_vanilla.env_wrappers.SkipFrame import SkipFrame
+from mario_vanilla.env_wrappers.DetectObjects import DetectObjects
+from mario_vanilla.env_wrappers.TransformAndFlatten import TransformAndFlatten
 
 
 # class SkipFrame(Wrapper):

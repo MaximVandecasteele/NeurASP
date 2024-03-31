@@ -4,9 +4,12 @@ import numpy as np
 from utils import *
 import os
 
-# first train B2
+
+# set seed for randomness, also works for pytorch code
 np.random.seed(1)
 
+
+# first train B2
 trainer = Trainer()
 env = trainer.init_environment(display=False, asp=True)
 dqn = trainer.build_dqn(input_dim=env.observation_space.shape, action_space=env.action_space.n, asp=True)
@@ -18,6 +21,8 @@ log_path = os.path.join(exp_name, "log")
 
 trainer.train(num_episodes=50000, save_interval=1000, exp_name=exp_name, env=env, dqn=dqn, model_path=model_path, log_path=log_path)
 
+# empty the memory
+trainer = None
 
 #  evaluate performance B1
 evaluator = Evaluator()
@@ -28,8 +33,7 @@ dqn = evaluator.build_dqn(input_dim=env.observation_space.shape, action_space=en
 
 exp_name = 'B1'
 eval_path = os.path.join(exp_name, "eval")
-evaluator.evaluate(num_episodes=1000, exp_name=exp_name, env=env, dqn=dqn, eval_path=eval_path)
-
+evaluator.evaluate(num_episodes=100, exp_name=exp_name, env=env, dqn=dqn, eval_path=eval_path)
 
 # evaluate performance B2
 evaluator = Evaluator()
@@ -40,9 +44,7 @@ dqn = evaluator.build_dqn(input_dim=env.observation_space.shape, action_space=en
 
 exp_name = 'B2'
 eval_path = os.path.join(exp_name, "eval")
-evaluator.evaluate(num_episodes=1000, exp_name=exp_name, env=env, dqn=dqn, eval_path=eval_path)
-
-
+evaluator.evaluate(num_episodes=100, exp_name=exp_name, env=env, dqn=dqn, eval_path=eval_path)
 
 # evaluate generalization B1
 

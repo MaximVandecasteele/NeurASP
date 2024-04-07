@@ -15,7 +15,8 @@ class Detector:
 
     def detect(self, observation) -> pd.DataFrame:
         # YOLO detection
-        results = self.model(observation, verbose=False)
+
+        results = self.model(observation, verbose=False, device='mps')
 
         # what if there are no detections?
         positions = pd.DataFrame(data=None, columns=['name', 'xmin', 'xmax', 'ymin', 'ymax'])

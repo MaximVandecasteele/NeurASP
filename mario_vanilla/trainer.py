@@ -3,15 +3,13 @@ import numpy as np
 import gym_super_mario_bros
 import os
 import csv
-import time
 from utils import *
-from B1.DQNVanilla import Dqn_vanilla
-from B2.DQNAsp import Dqn_asp
-from DQN import Dqn
+
+from mario_vanilla.DQN import Dqn
 
 from gym.vector.utils import spaces
 
-from wrappers import apply_wrappers, apply_ASP_wrappers
+from mario_vanilla.wrappers import apply_wrappers, apply_ASP_wrappers
 from mario_vanilla.symbolic_components.positioner import Positioner
 from mario_vanilla.symbolic_components.detector import Detector
 
@@ -41,10 +39,10 @@ class Trainer(object):
             "skip": 4,
             # VecFrameStack
             "stack_size": 4,
-            "detector_model_path": '../Object_detector/models/YOLOv8-Mario-lvl1-3/weights/best.pt',
-            "detector_label_path": '../Object_detector/models/data.yaml',
-            "positions_asp": './asp/positions.lp',
-            "show_asp": './asp/show.lp',
+            "detector_model_path": '/Users/maximvandecasteele/PycharmProjects/NeurASP/Object_detector/models/YOLOv8-Mario-lvl1-3/weights/best.pt',
+            "detector_label_path": '/Users/maximvandecasteele/PycharmProjects/NeurASP/Object_detector/models/data.yaml',
+            "positions_asp": '/Users/maximvandecasteele/PycharmProjects/NeurASP/mario_vanilla/asp/positions.lp',
+            "show_asp": '/Users/maximvandecasteele/PycharmProjects/NeurASP/mario_vanilla/asp/show.lp',
         }
 
         self.detector = Detector(self.config)

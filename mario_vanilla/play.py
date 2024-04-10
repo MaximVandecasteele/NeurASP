@@ -1,10 +1,10 @@
 import torch
-import gym_super_mario_bros
-import os
-from mario_vanilla.utils import *
-from mario_vanilla.DQN import Dqn
+
+from mario_vanilla.trainer import Trainer
+
 from nes_py.wrappers import JoypadSpace
-from mario_vanilla.wrappers import apply_wrappers
+from mario_vanilla.symbolic_components.detector import Detector
+from mario_vanilla.symbolic_components.positioner import Positioner
 
 # nes_py bugfix
 JoypadSpace.reset = lambda self, **kwargs: self.env.reset(**kwargs)
@@ -22,17 +22,6 @@ elif torch.cuda.is_available():
 else:
     print("CUDA is not available")
 
-
-config = {
-    "device": device_name,
-    # input dimensions of observation (64 objects of 5 characteristics, class, xmin, xmax, ymin, ymax)
-    "observation_dim": (16, 16),
-    # amount of frames to skip (skipframe)
-    "skip": 4,
-    # VecFrameStack
-    "stack_size": 4,
-}
-
 ENV_NAME = 'SuperMarioBros-1-1-v0'
 SHOULD_TRAIN = True
 # if you want to see mario play
@@ -41,16 +30,13 @@ DISPLAY = True
 NUM_OF_EPISODES = 50
 
 # 2. Create the base environment
-env = gym_super_mario_bros.make(ENV_NAME, render_mode='human' if DISPLAY else 'rgb', apply_api_compatibility=True)
-
-
 asp = False
 # 3. Apply the decorator chain
-print(env.observation_space)
-env = apply_wrappers(env, config)
 
+trainer = Trainer()
 
-agent = Dqn(input_dims=env.observation_space.shape, num_actions=env.action_space.n, asp=asp)
+env = trainer.init_environment(display=True, asp=asp)
+agent = trainer.build_dqn(input_dim=env.observation_space.shape, action_space=env.action_space.n,asp=asp)
 
 
 folder_name = ""

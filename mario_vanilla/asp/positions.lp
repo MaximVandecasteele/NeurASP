@@ -4,6 +4,8 @@
 
 enemy(XMIN, XMAX, YMIN, YMAX) :- goomba(XMIN,XMAX,YMIN,YMAX).
 enemy(XMIN, XMAX, YMIN, YMAX) :- koopa_troopa(XMIN,XMAX,YMIN,YMAX).
+enemy(XMIN, XMAX, YMIN, YMAX) :- koopa_paratroopa(XMIN,XMAX,YMIN,YMAX).
+enemy(XMIN, XMAX, YMIN, YMAX) :- shield(XMIN,XMAX,YMIN,YMAX).
 enemy(XMIN, XMAX, YMIN, YMAX) :- piranha_plant(XMIN,XMAX,YMIN,YMAX).
 
 platform(XMIN, XMAX, YMIN, YMAX) :- brick(XMIN,XMAX,YMIN,YMAX).
@@ -42,7 +44,7 @@ right(stone(XMIN1,XMAX1,YMIN1,YMAX1), stone(XMIN2,XMAX2,YMIN2,YMAX2)) :-  stone(
 wall(X1,X2,Y1,Y2) :- stone(X1,X2,Y1,Y2), above(_,stone(X1,X2,Y1,Y2)), not left(_,stone(X1,X2,Y1,Y2)).
 wall(X1,X2,Y1,Y2) :- stone(X1,X2,Y1,Y2), above(_,stone(X1,X2,Y1,Y2)), not right(_,stone(X1,X2,Y1,Y2)).
 
-hole(X,255,YMIN,YMAX) :- ground(XMIN,X,YMIN,YMAX), X = #max{XMAX:ground(_,XMAX,_,_)}, X < 25.
+hole(X,255,YMIN,YMAX) :- ground(XMIN,X,YMIN,YMAX), X = #max{XMAX:ground(_,XMAX,_,_)}, X < 250.
 hole(0,X,207,240) :- ground(X,XMAX,YMIN,YMAX), X = #min{XMIN:ground(XMIN,_,_,_)}, X > 5.
 
 hole(XMAX1,XMIN2,YMIN1,YMAX1) :- adjacent(ground(XMIN1,XMAX1,YMIN1,YMAX1), ground(XMIN2,XMAX2,YMIN2,YMAX2)).

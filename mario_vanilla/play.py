@@ -30,7 +30,7 @@ DISPLAY = True
 NUM_OF_EPISODES = 50
 
 # 2. Create the base environment
-asp = False
+asp = True
 # 3. Apply the decorator chain
 
 trainer = Trainer()
@@ -42,7 +42,7 @@ agent = trainer.build_dqn(input_dim=env.observation_space.shape, action_space=en
 folder_name = ""
 ckpt_name = ""
 # agent.load_model(os.path.join("models", folder_name, ckpt_name))
-agent.load_model('/Users/maximvandecasteele/PycharmProjects/NeurASP/mario_vanilla/B1/models/model_50000_iter.pt')
+agent.load_model('/Users/maximvandecasteele/PycharmProjects/NeurASP/mario_vanilla/B2_one_hot/models/model_6000_iter.pt')
 agent.epsilon = 0.15
 agent.eps_min = 0.0
 agent.eps_decay = 0.0

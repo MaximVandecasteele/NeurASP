@@ -8,10 +8,10 @@ from nes_py.wrappers import JoypadSpace
 from gym.vector.utils import spaces
 import numpy as np
 
-from stable_baselines3_master.stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
 from mario_vanilla.env_wrappers.SkipFrame import SkipFrame
 from mario_vanilla.env_wrappers.DetectObjects import DetectObjects
 from mario_vanilla.env_wrappers.TransformAndFlatten import TransformAndFlatten
+from mario_vanilla.env_wrappers.OneHot import OneHot
 
 
 # class SkipFrame(Wrapper):
@@ -58,8 +58,8 @@ def apply_ASP_wrappers(env, config, detector, positioner):
     # env = DummyVecEnv([lambda: env])
 
     # 5. Stack the frames
-    env = FrameStack(env, num_stack=config['stack_size'], lz4_compress=True)
+    # env = FrameStack(env, num_stack=config['stack_size'], lz4_compress=True)
     # env = VecFrameStack(env, config["stack_size"], channels_order='last')
-
+    # env = OneHot(env)
 
     return env

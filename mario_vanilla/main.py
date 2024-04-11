@@ -8,13 +8,14 @@ import os
 # set seed for randomness, also works for pytorch code
 np.random.seed(1)
 
-
+asp = True
 # first train B2
 trainer = Trainer()
-env = trainer.init_environment(display=False, asp=True)
-dqn = trainer.build_dqn(input_dim=env.observation_space.shape, action_space=env.action_space.n, asp=True)
+env = trainer.init_environment(display=False, asp=asp)
+dqn = trainer.build_dqn(input_dim=env.observation_space.shape, action_space=env.action_space.n, asp=asp)
 
-exp_name = 'B2_mps'
+
+exp_name = 'B2_one_hot'
 model_path = os.path.join(exp_name, "models")
 log_path = os.path.join(exp_name, "log")
 # log_path = 'output_B2.csv'

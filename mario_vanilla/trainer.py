@@ -35,6 +35,8 @@ class Trainer(object):
             "device": device_name,
             # input dimensions of observation (64 objects of 5 characteristics, class, xmin, xmax, ymin, ymax)
             "observation_dim": (15, 16),
+            # TODO: remove
+            "cnn_input_dim": (7, 15, 16),
             # amount of frames to skip
             "skip": 4,
             # VecFrameStack
@@ -55,8 +57,11 @@ class Trainer(object):
                                         apply_api_compatibility=True)
         if asp:
             # hack the observation space of the environment.
-            y, x = self.config["observation_dim"]
-            env.observation_space = spaces.Box(low=0, high=10, shape=(y, x), dtype=np.int8)
+            # TODO remove z dim
+            # y, x = self.config["observation_dim"]
+            z, y, x = self.config["cnn_input_dim"]
+            # env.observation_space = spaces.Box(low=0, high=10, shape=(y, x), dtype=np.int8)
+            env.observation_space = spaces.Box(low=0, high=10, shape=(z, y, x), dtype=np.int8)
             env = apply_ASP_wrappers(env, self.config, self.detector, self.positioner)
             print(env.observation_space)
         else:

@@ -2,6 +2,7 @@ import torch
 import numpy as np
 from mario_vanilla.B1.DQN_vanilla_nn import Dqn_vanilla_nn
 from mario_vanilla.B2.DQN_asp_nn import Dqn_asp_nn
+from mario_vanilla.Onehot.DQN_asp_nn_one_hot import Dqn_asp_nn_one_hot
 
 from tensordict import TensorDict
 from torchrl.data import TensorDictReplayBuffer, LazyMemmapStorage
@@ -13,7 +14,8 @@ class Dqn:
                  asp,
                  lr=0.00025, 
                  gamma=0.9, 
-                 epsilon=1.0, 
+                 epsilon=1.0,
+                 # epsilon=0.4,
                  eps_decay=0.99999975, 
                  eps_min=0.1, 
                  replay_buffer_capacity=80_000,
@@ -38,8 +40,11 @@ class Dqn:
 
         # Networks
         if asp:
-            self.online_network = Dqn_asp_nn(input_dims, num_actions)
-            self.target_network = Dqn_asp_nn(input_dims, num_actions, freeze=True)
+            # TODO REMOVE
+            # self.online_network = Dqn_asp_nn(input_dims, num_actions)
+            # self.target_network = Dqn_asp_nn(input_dims, num_actions, freeze=True)
+            self.online_network = Dqn_asp_nn_one_hot(input_dims, num_actions)
+            self.target_network = Dqn_asp_nn_one_hot(input_dims, num_actions, freeze=True)
         else:
             self.online_network = Dqn_vanilla_nn(input_dims, num_actions)
             self.target_network = Dqn_vanilla_nn(input_dims, num_actions, freeze=True)

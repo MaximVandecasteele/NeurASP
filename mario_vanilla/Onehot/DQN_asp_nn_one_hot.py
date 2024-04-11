@@ -37,7 +37,8 @@ class Dqn_asp_nn_one_hot(nn.Module):
         if freeze:
             self._freeze()
         
-        self.device = 'mps' if torch.backends.mps.is_available() else 'cpu'
+        # self.device = 'mps' if torch.backends.mps.is_available() else 'cpu'
+        self.device = torch.device("cuda:1")
         self.to(self.device)
 
     def forward(self, x):

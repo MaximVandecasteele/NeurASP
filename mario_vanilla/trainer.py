@@ -18,21 +18,20 @@ class Trainer(object):
 
         self.ENV_NAME = 'SuperMarioBros-1-1-v0'
 
-        self.device = 'cpu'
-        device_name = 'cpu'
         if torch.backends.mps.is_available():
             mps_device = torch.device(self.device)
             print("Using mps device.")
-            device = 'mps'
+            self.device = 'mps'
         elif torch.cuda.is_available():
-            device_name = torch.cuda.get_device_name(0)
+            device_name = torch.cuda.get_device_name(1)
             print("Using CUDA device:", device_name)
-            device = 'cuda'
+            self.device = 'cuda:1'
         else:
             print("CUDA is not available")
+            self.device = 'cpu'
 
         self.config = {
-            "device": device_name,
+            "device": self.device,
             # input dimensions of observation (64 objects of 5 characteristics, class, xmin, xmax, ymin, ymax)
             "observation_dim": (15, 16),
             # TODO: remove
@@ -41,10 +40,10 @@ class Trainer(object):
             "skip": 4,
             # VecFrameStack
             "stack_size": 4,
-            "detector_model_path": '/Users/maximvandecasteele/PycharmProjects/NeurASP/Object_detector/models/YOLOv8-Mario-lvl1-3/weights/best.pt',
-            "detector_label_path": '/Users/maximvandecasteele/PycharmProjects/NeurASP/Object_detector/models/data.yaml',
-            "positions_asp": '/Users/maximvandecasteele/PycharmProjects/NeurASP/mario_vanilla/asp/positions.lp',
-            "show_asp": '/Users/maximvandecasteele/PycharmProjects/NeurASP/mario_vanilla/asp/show.lp',
+            "detector_model_path": '/home/stefaan/local/python/NeurASP/Object_detector/models/YOLOv8-Mario-lvl1-3/weights/best.pt',
+            "detector_label_path": '/home/stefaan/local/python/NeurASP/Object_detector/models/data.yaml',
+            "positions_asp": '/home/stefaan/local/python/NeurASP/mario_vanilla/asp/positions.lp',
+            "show_asp": '/home/stefaan/local/python/NeurASP/mario_vanilla/asp/show.lp',
         }
 
         self.detector = Detector(self.config)

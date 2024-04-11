@@ -1,4 +1,5 @@
 import pandas as pd
+import torch
 import yaml
 from ultralytics import YOLO
 
@@ -8,6 +9,20 @@ class Detector:
     def __init__(self, config):
         super().__init__()
         self.model = YOLO(config["detector_model_path"])
+#        self.device_name = 'cpu'
+        self.device = config['device']
+#        device_name = 'cpu'
+#        if torch.backends.mps.is_available():
+#            mps_device = torch.device(self.device)
+#            print("Using mps device.")
+#            self.device = 'mps'
+#        elif torch.cuda.is_available():
+#            self.device_name = torch.cuda.get_device_name(0)
+#            print("Using CUDA device:", device_name)
+#            self.device = 'cuda:1'
+#        else:
+#           print("CUDA is not available")
+#           self.device = 'cpu'
 
         with open(config["detector_label_path"], 'r') as file:
             data = yaml.safe_load(file)
@@ -16,7 +31,7 @@ class Detector:
     def detect(self, observation) -> pd.DataFrame:
         # YOLO detection
 
-        results = self.model(observation, verbose=False, device='mps')
+        results = self.model(observation, verbose=False, device=self.device)
 
         # what if there are no detections?
         positions = pd.DataFrame(data=None, columns=['name', 'xmin', 'xmax', 'ymin', 'ymax'])

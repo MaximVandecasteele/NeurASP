@@ -91,8 +91,9 @@ class Dqn:
         torch.save(self.online_network.state_dict(), path)
 
     def load_model(self, path):
-        self.online_network.load_state_dict(torch.load(path))
-        self.target_network.load_state_dict(torch.load(path))
+        # TODO set back to removed map_location
+        self.online_network.load_state_dict(torch.load(path, map_location='mps'))
+        self.target_network.load_state_dict(torch.load(path, map_location='mps'))
 
     def change_seed(self, seed):
         np.random.seed(seed)

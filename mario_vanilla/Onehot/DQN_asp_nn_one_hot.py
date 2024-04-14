@@ -16,6 +16,8 @@ class Dqn_asp_nn_one_hot(nn.Module):
         #         # nn.ReLU(),
         # )
 
+
+
         self.conv_layers = nn.Sequential(
                 nn.Conv2d(in_channels=7, out_channels=16, kernel_size=3, stride=1, padding=1),
                 nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1),
@@ -38,7 +40,18 @@ class Dqn_asp_nn_one_hot(nn.Module):
             self._freeze()
         
         # self.device = 'mps' if torch.backends.mps.is_available() else 'cpu'
-        self.device = torch.device("cuda:1")
+        if torch.backends.mps.is_available():
+            print("Using mps device.")
+            self.device = 'mps'
+        elif torch.cuda.is_available():
+            device_name = torch.cuda.get_device_name(1)
+            print("Using CUDA device:", device_name)
+            self.device = torch.device("cuda:1")
+        else:
+            print("CUDA is not available")
+            self.device = 'cpu'
+
+        # self.device = torch.device("cuda:1")
         self.to(self.device)
 
     def forward(self, x):

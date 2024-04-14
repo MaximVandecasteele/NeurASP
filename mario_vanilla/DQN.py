@@ -1,8 +1,8 @@
 import torch
 import numpy as np
-from mario_vanilla.B1.DQN_vanilla_nn import Dqn_vanilla_nn
-from mario_vanilla.B2.DQN_asp_nn import Dqn_asp_nn
-from mario_vanilla.Onehot.DQN_asp_nn_one_hot import Dqn_asp_nn_one_hot
+from mario_vanilla.DQN_architectures.DQN_vanilla_nn import Dqn_vanilla_nn
+from mario_vanilla.DQN_architectures.DQN_asp_nn_one_hot import Dqn_asp_nn_one_hot
+from mario_vanilla.DQN_architectures.DQN_asp_mlp_focus import Dqn_asp_mlp_focus
 
 from tensordict import TensorDict
 from torchrl.data import TensorDictReplayBuffer, LazyMemmapStorage
@@ -43,8 +43,10 @@ class Dqn:
             # TODO REMOVE
             # self.online_network = Dqn_asp_nn(input_dims, num_actions)
             # self.target_network = Dqn_asp_nn(input_dims, num_actions, freeze=True)
-            self.online_network = Dqn_asp_nn_one_hot(input_dims, num_actions)
-            self.target_network = Dqn_asp_nn_one_hot(input_dims, num_actions, freeze=True)
+            # self.online_network = Dqn_asp_nn_one_hot(input_dims, num_actions)
+            # self.target_network = Dqn_asp_nn_one_hot(input_dims, num_actions, freeze=True)
+            self.online_network = Dqn_asp_mlp_focus(input_dims, num_actions)
+            self.target_network = Dqn_asp_mlp_focus(input_dims, num_actions, freeze=True)
         else:
             self.online_network = Dqn_vanilla_nn(input_dims, num_actions)
             self.target_network = Dqn_vanilla_nn(input_dims, num_actions, freeze=True)
@@ -92,8 +94,8 @@ class Dqn:
 
     def load_model(self, path):
         # TODO set back to removed map_location
-        self.online_network.load_state_dict(torch.load(path, map_location='mps'))
-        self.target_network.load_state_dict(torch.load(path, map_location='mps'))
+        self.online_network.load_state_dict(torch.load(path))
+        self.target_network.load_state_dict(torch.load(path))
 
     def change_seed(self, seed):
         np.random.seed(seed)

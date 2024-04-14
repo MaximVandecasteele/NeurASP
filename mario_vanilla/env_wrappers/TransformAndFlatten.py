@@ -31,23 +31,10 @@ class TransformAndFlatten(ObservationWrapper):
             matrix[row, col] = val
 
         result = self.one_hot_encode(matrix,7)
+        # TODO flattten
+        result = result.flatten()
 
         return result
-
-    # def one_hot_encode(self, matrix, num_classes):
-    #     # Flatten the matrix to a vector
-    #     flat_matrix = matrix.flatten()
-    #
-    #     # Create a one-hot encoded matrix of zeros
-    #     one_hot_matrix = np.zeros((flat_matrix.size, num_classes))
-    #
-    #     # Set the appropriate element to one
-    #     one_hot_matrix[np.arange(flat_matrix.size), flat_matrix] = 1
-    #
-    #     # Reshape back to the original matrix shape with an added dimension for the one-hot encoding
-    #     one_hot_matrix = one_hot_matrix.reshape(*matrix.shape, num_classes)
-    #
-    #     return one_hot_matrix
 
     def one_hot_encode(self, matrix, num_classes):
         # Get the height and width of the original matrix

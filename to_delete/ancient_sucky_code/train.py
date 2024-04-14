@@ -67,14 +67,14 @@ asp = False
 
 if architecture == 0:
     asp = False
-    model_path = os.path.join('../../mario_vanilla/B1', "models", get_current_date_time_string())
+    model_path = os.path.join('../../mario_vanilla/trained_models/B1', "models", get_current_date_time_string())
     os.makedirs(model_path, exist_ok=True)
     # 3. Apply the decorator chain
     print(env.observation_space)
     env = apply_wrappers(env, config)
 elif architecture == 1:
     asp = True
-    model_path = os.path.join('../../mario_vanilla/B2', "models", get_current_date_time_string())
+    model_path = os.path.join('../../mario_vanilla/trained_models/B2', "models", get_current_date_time_string())
     os.makedirs(model_path, exist_ok=True)
     # Create the object detector. This is a YOLO8 model
     detector = Detector(config)
@@ -92,7 +92,7 @@ agent = Dqn(input_dims=env.observation_space.shape, num_actions=env.action_space
 if not SHOULD_TRAIN:
     folder_name = ""
     ckpt_name = ""
-    agent.load_model(os.path.join("../../mario_vanilla/B1/models", folder_name, ckpt_name))
+    agent.load_model(os.path.join("../../mario_vanilla/trained_models/B1/models", folder_name, ckpt_name))
     agent.epsilon = 0.2
     agent.eps_min = 0.0
     agent.eps_decay = 0.0
@@ -119,7 +119,7 @@ for i in range(NUM_OF_EPISODES):
     data = [[i, total_reward, agent.loss_score.item(), agent.learn_step_counter, agent.epsilon, len(agent.replay_buffer)]]
     print("Total reward:", total_reward, "Loss:", agent.loss_score.item(), "Learn step counter:", agent.learn_step_counter, "Epsilon:", agent.epsilon, "Size of replay buffer:", len(agent.replay_buffer))
 
-    file_path = f'../../mario_vanilla/B1/log/output_B1.csv'
+    file_path = f'../../mario_vanilla/trained_models/B1/log/output_B1.csv'
 
     if not os.path.isfile(file_path):
         with open(file_path, mode='w', newline='') as file:

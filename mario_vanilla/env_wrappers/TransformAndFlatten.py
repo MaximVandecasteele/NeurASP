@@ -19,8 +19,9 @@ class TransformAndFlatten(ObservationWrapper):
         """
 
         cell_list = self.positioner.position(observation)
-
-        return self.convert_ASP_cells_to_matrix(cell_list, self.dim)
+        result = self.convert_ASP_cells_to_matrix(cell_list, self.dim)
+        result = np.uint8(result * 255 / 6)
+        return result
 
     def convert_ASP_cells_to_matrix(self, cell_list: list, dim) -> ndarray:
 
@@ -28,13 +29,13 @@ class TransformAndFlatten(ObservationWrapper):
 
         for cell in cell_list:
             row, col, val = map(int, cell.strip('cell().').split(','))
-            matrix[row, col] = val
+            matrix[row, col, 0] = val
 
-        result = self.one_hot_encode(matrix,7)
-        # TODO flattten
-        result = result.flatten()
+        # result = self.one_hot_encode(matrix,7)
+        # # TODO flattten
+        # result = result.flatten()
 
-        return result
+        return matrix
 
     def one_hot_encode(self, matrix, num_classes):
         # Get the height and width of the original matrix

@@ -43,10 +43,10 @@ class Dqn:
             # TODO REMOVE
             # self.online_network = Dqn_asp_nn(input_dims, num_actions)
             # self.target_network = Dqn_asp_nn(input_dims, num_actions, freeze=True)
-            # self.online_network = Dqn_asp_nn_one_hot(input_dims, num_actions)
-            # self.target_network = Dqn_asp_nn_one_hot(input_dims, num_actions, freeze=True)
-            self.online_network = Dqn_asp_mlp_focus(input_dims, num_actions)
-            self.target_network = Dqn_asp_mlp_focus(input_dims, num_actions, freeze=True)
+            self.online_network = Dqn_asp_nn_one_hot(input_dims, num_actions)
+            self.target_network = Dqn_asp_nn_one_hot(input_dims, num_actions, freeze=True)
+            # self.online_network = Dqn_asp_mlp_focus(input_dims, num_actions)
+            # self.target_network = Dqn_asp_mlp_focus(input_dims, num_actions, freeze=True)
         else:
             self.online_network = Dqn_vanilla_nn(input_dims, num_actions)
             self.target_network = Dqn_vanilla_nn(input_dims, num_actions, freeze=True)
@@ -96,6 +96,8 @@ class Dqn:
         # TODO set back to removed map_location
         self.online_network.load_state_dict(torch.load(path))
         self.target_network.load_state_dict(torch.load(path))
+        # self.online_network.load_state_dict(torch.load(path,map_location='mps'))
+        # self.target_network.load_state_dict(torch.load(path,map_location='mps'))
 
     def change_seed(self, seed):
         np.random.seed(seed)

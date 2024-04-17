@@ -8,7 +8,7 @@ import torch
 DISPLAY = True
 UBUNTU = False
 ASP = True
-MLP = True
+MLP = False
 
 if torch.backends.mps.is_available():
     # mps_device = torch.device(self.device)

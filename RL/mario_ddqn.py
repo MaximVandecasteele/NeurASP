@@ -49,7 +49,7 @@ parser.add_argument("-inf","--inference_type",help="Wether to run inference with
 parser.add_argument("-t","--train",help="Training mode",action='store_true',default=True)
 parser.add_argument("--max_exp_r",help="Max exploration rate. Defaults to 1", type=float,default=1.0)
 parser.add_argument("--min_exp_r",help="Min_exp_rate minimum value for exploration rate",type=float,default=0.02) #if set to 0, it will stop exploring and probably plateau.
-parser.add_argument("-e","--epochs",help="Amount of epochs to train for.",type=int,default=1000)
+parser.add_argument("-e","--epochs",help="Amount of epochs to train for.",type=int,default=5000)
 parser.add_argument("-bue","--backup_epochs",help="Backups every e epochs.",type=int,default=100)
 parser.add_argument("-sgm","--save_good_model",help="If a model outperforms X times in a row, save it just in case.",type=int,default=-1)
 
@@ -345,7 +345,8 @@ def run(asp, training_mode, pretrained):
     #Plot rewards evolution
     if training_mode == True:
         # File path to save CSV
-        csv_file_path = 'training_run_baseline/tensorboard_asp/csv/data_asp_run1.csv'
+        # csv_file_path = 'training_run_baseline/tensorboard_asp/csv/data_asp_run1.csv'
+        csv_file_path = 'data_asp_run1.csv'
         # Writing list to CSV
         with open(csv_file_path, 'w', newline='') as file:
             writer = csv.writer(file)

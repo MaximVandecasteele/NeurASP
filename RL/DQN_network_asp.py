@@ -8,11 +8,33 @@ class DQNSolver_asp(nn.Module):
     def __init__(self, input_shape, n_actions):
         super(DQNSolver_asp, self).__init__()
         self.conv = nn.Sequential(
+            # nn.Conv2d(input_shape[0], 64, kernel_size=4, stride=2),
+            # nn.ReLU(),
+            # nn.Conv2d(64, 64, kernel_size=2, stride=1),
+            # nn.ReLU()
+
+            # #Dit was een ok versie, net iets slechter dan vanilla
             # nn.Conv2d(input_shape[0], 32, kernel_size=4, stride=1),
             # nn.ReLU(),
-            nn.Conv2d(input_shape[0], 64, kernel_size=4, stride=2),
+            # nn.Conv2d(32, 64, kernel_size=4, stride=1),
+            # nn.ReLU(),
+            # nn.Conv2d(64, 64, kernel_size=3, stride=1),
+            # nn.ReLU()
+
+            # # Deze begon heel snel, maar vlakte dan enorm af op 1250
+            # nn.Conv2d(input_shape[0], 64, kernel_size=4, stride=1),
+            # nn.ReLU(),
+            # nn.Conv2d(64, 64, kernel_size=4, stride=1),
+            # nn.ReLU(),
+            # nn.Conv2d(64, 64, kernel_size=3, stride=1),
+            # nn.ReLU()
+
+            # # Deze begon heel snel, maar vlakte dan enorm af op 1250
+            nn.Conv2d(input_shape[0], 64, kernel_size=4, stride=1),
             nn.ReLU(),
-            nn.Conv2d(64, 64, kernel_size=2, stride=1),
+            nn.Conv2d(64, 64, kernel_size=4, stride=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1),
             nn.ReLU()
         )
 

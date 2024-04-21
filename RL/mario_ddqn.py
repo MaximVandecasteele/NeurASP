@@ -6,6 +6,7 @@
 # !apt-get update
 # !apt-get install ffmpeg libsm6 libxext6  -y
 
+import csv
 from ast import parse
 from turtle import back
 import torch
@@ -37,7 +38,7 @@ import argparse
 import os
 parser = argparse.ArgumentParser()
 #Run settings:
-parser.add_argument("-vis","--visualization",help="Visualize the game screen",action='store_true', default=True)
+parser.add_argument("-vis","--visualization",help="Visualize the game screen",action='store_true', default=False)
 parser.add_argument("--level",help="What level to play",type=str,default="1-1")
 parser.add_argument("--tensorboard",help="Log to tensorboard. Default = True",default=True)
 parser.add_argument("--run_name",help="A name for the run. Used in tensorboard. Defaults to Test",type=str,default="Test")
@@ -48,12 +49,12 @@ parser.add_argument("-inf","--inference_type",help="Wether to run inference with
 parser.add_argument("-t","--train",help="Training mode",action='store_true',default=True)
 parser.add_argument("--max_exp_r",help="Max exploration rate. Defaults to 1", type=float,default=1.0)
 parser.add_argument("--min_exp_r",help="Min_exp_rate minimum value for exploration rate",type=float,default=0.02) #if set to 0, it will stop exploring and probably plateau.
-parser.add_argument("-e","--epochs",help="Amount of epochs to train for.",type=int,default=5000)
+parser.add_argument("-e","--epochs",help="Amount of epochs to train for.",type=int,default=1000)
 parser.add_argument("-bue","--backup_epochs",help="Backups every e epochs.",type=int,default=100)
 parser.add_argument("-sgm","--save_good_model",help="If a model outperforms X times in a row, save it just in case.",type=int,default=-1)
 
 #Model saving and loading
-parser.add_argument("-wd","--working_dir",help='Where will files be stored to and loaded from',type=str,default="Models") #required=True
+parser.add_argument("-wd","--working_dir",help='Where will files be stored to and loaded from',type=str,default="Models_asp_mac") #required=True
 parser.add_argument("-pt","--pretrained_weights",help="Use a pretrained model. Defaults to False",action='store_true', default=False)
 parser.add_argument("-mn","--model_name",help="Name of the model to load (if different from default)",type=str, default="")
 
@@ -343,6 +344,19 @@ def run(asp, training_mode, pretrained):
     env.close()
     #Plot rewards evolution
     if training_mode == True:
+        # File path to save CSV
+        csv_file_path = 'training_run_baseline/tensorboard_asp/csv/data_asp_run1.csv'
+        # Writing list to CSV
+        with open(csv_file_path, 'w', newline='') as file:
+            writer = csv.writer(file)
+            ep = 1
+            for item in total_rewards:
+                writer.writerow([ep, item])
+                ep += 1
+
+        print("CSV file has been created successfully.")
+
+
         plt.title("Episodes trained vs. Average Rewards (per 500 eps)")
         plt.plot(total_rewards)
         plt.show()

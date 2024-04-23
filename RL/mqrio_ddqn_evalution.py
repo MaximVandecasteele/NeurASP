@@ -38,18 +38,18 @@ import argparse
 import os
 
 config = {
-    'vis': True,
+    'vis': False,
     'level': '1-1',
     'tensorboard' : True,
     # asp or rgb
-    'input_type': 'rgb',
+    'input_type': 'asp',
     'inference_type': 'pure',
-    'train': True,
+    'train': False,
     'max_exp_r': 1.0,
     'min_exp_r': 0.02,
     'num_runs': 5,
     'epochs': 100,
-    'working_dir': 'training_run_baseline/Models_rgb/',
+    'working_dir': 'training_run_baseline/Models_asp/',
     'pretrained_weights': True,
     'load_experience_replay': False,
     'save_experience_replay': False,
@@ -77,8 +77,8 @@ input_type = config['input_type']
 ##Training settings:
 if training ==  False:
     if inference_type == 'pure':
-        max_exploration_rate = 0.1
-        min_exploration_rate = 0.1
+        max_exploration_rate = 0.02
+        min_exploration_rate = 0.02
     else:
         max_exploration_rate = min_exp_r
         min_exploration_rate = min_exp_r
@@ -160,7 +160,7 @@ def run(asp, pretrained):
     observation_space = env.observation_space.shape
     action_space = env.action_space.n
 
-    csv_file_path = f'data_{input_type}.csv'
+    csv_file_path = f'data_performance_{input_type}.csv'
 
     if not os.path.isfile(csv_file_path):
         with open(csv_file_path, mode='w', newline='') as file:
@@ -193,10 +193,10 @@ def run(asp, pretrained):
 
                 #If using tensorboard initialize summary_writer
                 if use_tensorboard == True:
-                    tensorboard_writer = SummaryWriter(f'tensorboard_evaluation/rgb_performance/run{m + 1}_model{e}')
+                    tensorboard_writer = SummaryWriter(f'training_run_baseline/tensorboard_evaluation/{input_type}_performance/run{m + 1}_model{e}')
 
                 #Each iteration is an episode (epoch)
-                for ep_num in tqdm(range(epochs)):
+                for ep_num in range(epochs):
                     #Reset state and convert to tensor
                     state = env.reset()
                     state = torch.Tensor(np.array([state]))
@@ -224,6 +224,7 @@ def run(asp, pretrained):
                         #Get x_position (used only with tensorboard)
                         if use_tensorboard == True:
                             x_pos = info['x_pos']
+                            flag = info['flag_get']
                         #Is the new state a terminal state?
                         terminal = torch.tensor(np.array([int(terminal)])).unsqueeze(0)
                         #Update state to current one
@@ -239,11 +240,11 @@ def run(asp, pretrained):
                             break
                         elif terminal == True:
                             break #End episode loop
-                    data = [[m + 1, e, ep_num + 1, total_reward, agent.ending_position]]
+                    data = [[m + 1, e, ep_num + 1, total_reward, flag]]
                     for row in data:
                         writer.writerow(row)
                     print(f"{m+1}-{e}-{ep_num + 1}: {total_reward}")
-                env.close()
+    env.close()
 
 
 

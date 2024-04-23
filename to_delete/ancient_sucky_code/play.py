@@ -64,14 +64,14 @@ asp = False
 
 if architecture == 0:
     asp = False
-    model_path = os.path.join('../../mario_vanilla/trained_models/B1', "models", get_current_date_time_string())
+    model_path = os.path.join('../mario_vanilla/trained_models/B1', "models", get_current_date_time_string())
     os.makedirs(model_path, exist_ok=True)
     # 3. Apply the decorator chain
     print(env.observation_space)
     env = apply_wrappers(env, config)
 elif architecture == 1:
     asp = True
-    model_path = os.path.join('../../mario_vanilla/trained_models/B2', "models", get_current_date_time_string())
+    model_path = os.path.join('../mario_vanilla/trained_models/B2', "models", get_current_date_time_string())
     os.makedirs(model_path, exist_ok=True)
     # Create the object detector. This is a YOLO8 model
     detector = Detector(config)

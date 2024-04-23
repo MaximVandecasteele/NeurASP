@@ -11,7 +11,7 @@ from DQN import Dqn
 from gym.vector.utils import spaces
 from wrappers import apply_wrappers, apply_ASP_wrappers
 from mario_vanilla.symbolic_components.positioner import Positioner
-from mario_vanilla.symbolic_components.detector import Detector
+from to_delete.mario_vanilla.symbolic_components.detector import Detector
 
 class Evaluator(object):
     def __init__(self, config):

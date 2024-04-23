@@ -6,7 +6,7 @@ import cv2
 from segmentator import Segmentator
 from symbolic_components.positioner import Positioner
 from symbolic_components.detector import Detector
-
+import torch
 
 from segmentator import Segmentator
 
@@ -42,20 +42,20 @@ class MaxAndSkipEnv(gym.Wrapper):
         return obs
 
 
-config_ubuntu = {
-    "detector_model_path": '/home/stefaan/local/python/NeurASP/Object_detector/models/YOLOv8-Mario-lvl1-3/weights/best.pt',
-    "detector_label_path": '/home/stefaan/local/python/NeurASP/Object_detector/models/data.yaml',
-    "positions_asp": '/home/stefaan/local/python/NeurASP/mario_vanilla/asp/positions.lp',
-    "show_asp": '/home/stefaan/local/python/NeurASP/mario_vanilla/asp/show.lp'
-}
-config_mac = {
-    "detector_model_path": '/Users/maximvandecasteele/PycharmProjects/NeurASP/Object_detector/models/YOLOv8-Mario-lvl1-3/weights/best.pt',
-    "detector_label_path": '/Users/maximvandecasteele/PycharmProjects/NeurASP/Object_detector/models/data.yaml',
-    "positions_asp": '/Users/maximvandecasteele/PycharmProjects/NeurASP/mario_vanilla/asp/positions_lens.lp',
-    "show_asp": '/Users/maximvandecasteele/PycharmProjects/NeurASP/mario_vanilla/asp/show.lp'
-}
-
-
+if torch.backends.mps.is_available():
+    config = {
+            "detector_model_path": '/Users/maximvandecasteele/PycharmProjects/NeurASP/Object_detector/models/YOLOv8-Mario-lvl1-3/weights/best.pt',
+            "detector_label_path": '/Users/maximvandecasteele/PycharmProjects/NeurASP/Object_detector/models/data.yaml',
+            "positions_asp": '/Users/maximvandecasteele/PycharmProjects/NeurASP/RL/asp/positions.lp',
+            "show_asp": '/Users/maximvandecasteele/PycharmProjects/NeurASP/RL/asp/show.lp'
+        }
+elif torch.cuda.is_available():
+    config = {
+            "detector_model_path": '/home/stefaan/local/python/NeurASP/Object_detector/models/YOLOv8-Mario-lvl1-3/weights/best.pt',
+            "detector_label_path": '/home/stefaan/local/python/NeurASP/Object_detector/models/data.yaml',
+            "positions_asp": '/home/stefaan/local/python/NeurASP/RL/asp/positions.lp',
+            "show_asp": '/home/stefaan/local/python/NeurASP/RL/asp/show.lp'
+        }
 
 class ProcessFrame(gym.ObservationWrapper):
     """
@@ -75,12 +75,11 @@ class ProcessFrame(gym.ObservationWrapper):
         if self.input_type == 'ss':
             self.segmentator = Segmentator()
         elif self.input_type == 'asp':
-            self.detector = Detector(config_mac)
-            self.positioner = Positioner(config_mac)
+            self.detector = Detector(config)
+            self.positioner = Positioner(config)
 
     def observation(self, obs):
         return self.process(obs, self.input_type)
-
 
     def process(self, frame, input_type):
         if frame.size == 240 * 256 * 3:
@@ -124,26 +123,7 @@ class ProcessFrame(gym.ObservationWrapper):
             row, col, val = map(int, cell.strip('cell().').split(','))
             matrix[row, col, 0] = val
 
-        # result = self.one_hot_encode(matrix,7)
-        # result = result.flatten()
-
         return matrix
-
-    # def one_hot_encode(self, matrix, num_classes):
-    #     # Get the height and width of the original matrix
-    #     height, width = matrix.shape
-    #
-    #     # Initialize the one-hot encoded matrix with zeros
-    #     one_hot_matrix = np.zeros((num_classes, height, width), dtype=np.int32)
-    #
-    #     # Iterate over the matrix and set the appropriate index to 1
-    #     for i in range(height):
-    #         for j in range(width):
-    #             class_index = matrix[i, j]
-    #             one_hot_matrix[class_index, i, j] = 1
-    #
-    #     return one_hot_matrix
-
 
 
 #Defines a float 32 image with a given shape and shifts color channels to be the first dimension (for pytorch)

@@ -3,8 +3,6 @@ import torch
 from mario_vanilla.trainer import Trainer
 
 from nes_py.wrappers import JoypadSpace
-from mario_vanilla.symbolic_components.detector import Detector
-from mario_vanilla.symbolic_components.positioner import Positioner
 
 # nes_py bugfix
 JoypadSpace.reset = lambda self, **kwargs: self.env.reset(**kwargs)

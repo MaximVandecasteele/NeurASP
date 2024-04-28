@@ -39,16 +39,16 @@ import os
 
 config = {
     'vis': True,
-    'level': '1-1',
+    'level': '5-2',
     # asp or rgb
     'input_type': 'asp',
     'inference_type': 'pure',
     'train': True,
-    'exp_r': 0.1,
+    'exp_r': 0.02,
     'num_runs': 5,
     'epochs': 100,
-    'working_dir': 'Models_asp/run_1/',
-    'model': 'run3_',
+    'working_dir': 'training_run_baseline/Models_asp/run_4/',
+    'model': 'run4_5000best_performer_',
     'pretrained_weights': True,
     'load_experience_replay': False,
     'save_experience_replay': False,

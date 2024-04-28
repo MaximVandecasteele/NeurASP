@@ -21,11 +21,11 @@ ENV_NAME = 'SuperMarioBros-1-1-v0'
 
 DISPLAY = True
 
-env = gym_super_mario_bros.make(ENV_NAME, render_mode='rgb_array' if DISPLAY else 'rgb', apply_api_compatibility=True)
+env = gym_super_mario_bros.make('SuperMarioBros-'+'1-1'+'-v0')
 env = JoypadSpace(env, COMPLEX_MOVEMENT)
 JoypadSpace.reset = lambda self, **kwargs: self.env.reset(**kwargs)
 #
-# env = apply_img_capture_wrappers(env, ENV_NAME)
+env = apply_img_capture_wrappers(env, ENV_NAME)
 
 
 mapping = {

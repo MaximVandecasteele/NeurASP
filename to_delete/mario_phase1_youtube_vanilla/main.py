@@ -8,7 +8,7 @@ from agent import Agent
 from nes_py.wrappers import JoypadSpace
 
 from detector import Detector
-from wrappers import apply_wrappers
+from Object_detector.wrappers import apply_wrappers
 
 import os
 

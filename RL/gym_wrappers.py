@@ -3,12 +3,12 @@ import gym
 import collections
 import numpy as np
 import cv2
-from segmentator import Segmentator
-from symbolic_components.positioner import Positioner
-from symbolic_components.detector import Detector
+
+from RL.symbolic_components.positioner import Positioner
+from RL.symbolic_components.detector import Detector
 import torch
 
-from segmentator import Segmentator
+from RL.segmentator import Segmentator
 
 
 ##### Setting up Mario environment #########

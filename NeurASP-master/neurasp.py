@@ -362,7 +362,7 @@ class NeurASP(object):
                     # Step 2.5: backpropogate TODO msp device changes
                     for m in nnOutput:
                         for t in nnOutput[m]:
-                            if self.device.type == 'cuda':
+                            if self.device == 'cuda':
                                 nnOutput[m][t].backward(torch.cuda.FloatTensor(np.reshape(np.array(self.nnGradients[m][t]),nnOutput[m][t].shape)), retain_graph=True)
                             else:
                                 nnOutput[m][t].backward(torch.FloatTensor(np.reshape(np.array(self.nnGradients[m][t]),nnOutput[m][t].shape)), retain_graph=True)
@@ -395,7 +395,10 @@ class NeurASP(object):
                 with open(smPickle, 'wb') as fp:
                     pickle.dump(self.stableModels, fp)
                 savePickle = False
-
+            # TODO save interval
+            for m in self.nnMapping:
+                model = self.nnMapping[m]
+                torch.save(model.state_dict(), "/Users/maximvandecasteele/PycharmProjects/NeurASP/NeurASP-master/models/pre/neurasp_" + str(epochIdx) + "_model.pt")
     def testNN(self, nn, testLoader):
         """
         Return a real number in [0,100] denoting accuracy
@@ -430,7 +433,7 @@ class NeurASP(object):
         singleAccuracy = 100. * singleCorrect / singleTotal
         return accuracy, singleAccuracy
     
-    # We interprete the most probable stable model(s) as the prediction of the inference mode
+    # We interpret the most probable stable model(s) as the prediction of the inference mode
     # and check the accuracy of the inference mode by checking whether the obs is satisfied by the prediction
     def testInferenceResults(self, dataList, obsList):
         """ Return a real number in [0,1] denoting the accuracy

@@ -20,7 +20,8 @@ class DQNSolver_asp(nn.Module):
         self.fc = nn.Sequential(
             nn.Linear(conv_out_size, 512),
             nn.ReLU(),
-            nn.Linear(512, n_actions)
+            nn.Linear(512, n_actions),
+            nn.Softmax()
         )
 
         self.gradients = None
@@ -33,8 +34,9 @@ class DQNSolver_asp(nn.Module):
         conv_out = self.conv(x)
 
         conv_out.register_hook(self.activations_hook)
-
-        return self.fc(conv_out.view(x.size()[0], -1))
+        # reshape = conv_out.view(x.size()[0], -1)
+        reshape = conv_out.view(3584)
+        return self.fc(reshape)
 
     def activations_hook(self, grad):
         self.gradients = grad
@@ -44,3 +46,36 @@ class DQNSolver_asp(nn.Module):
 
     def get_activations(self, x):
         return self.conv(x)
+
+
+def testNN(model, tensors_test, symbols_test, device):
+    """
+    Return a real number "accuracy" in [0,100] which counts 1 for each data instance;
+           a real number "singleAccuracy" in [0,100] which counts 1 for each number in the label
+    @param model: a PyTorch model whose accuracy is to be checked
+    @oaram testLoader: a PyTorch dataLoader object, including (input, output) pairs for model
+    """
+    # set up testing mode
+    model.eval()
+
+    # check if total prediction is correct
+    correct = 0
+    total = 0
+    # check if each single prediction is correct
+    singleCorrect = 0
+    singleTotal = 0
+
+    indices = len(tensors_test)
+    for index in range(indices):
+        tensor = tensors_test[index]['state'].to(device)
+        symbols = symbols_test[index]
+
+        output = model(tensor)
+        pred = output.argmax(dim=-1)
+
+        correct += 1 if pred in symbols else False
+        total += 1
+
+    accuracy = 100. * correct / total
+
+    return accuracy

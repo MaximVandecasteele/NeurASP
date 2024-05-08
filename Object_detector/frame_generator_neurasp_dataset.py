@@ -28,7 +28,7 @@ mapping = {
 
 # Create gym environment
 
-env = gym_super_mario_bros.make('SuperMarioBros-'+'2f-1'+'-v0')
+env = gym_super_mario_bros.make('SuperMarioBros-'+'1-1'+'-v0')
 env = JoypadSpace(env, COMPLEX_MOVEMENT)
 JoypadSpace.reset = lambda self, **kwargs: self.env.reset(**kwargs)
 env = make_neurasp_env(env)

@@ -256,7 +256,6 @@ class CaptureFrames(ObservationWrapper):
 def apply_img_capture_wrappers(env, env_name):
     # env = SkipFrame(env, skip=4)  # Num of frames to apply one action to
     env = CaptureFrames(env, env_name)  # intercept image and convert to object positions
-
     return env
 
 
@@ -264,13 +263,13 @@ def make_neurasp_env(env):
     input_type = 'asp'
     env = MaxAndSkipEnv(env)
     #print(env.observation_space.shape)
-    env = ProcessFrame(input_type, 'symbols3.csv', env)
+    env = ProcessFrame(input_type, 'symbols5.csv', env)
     #print(env.observation_space.shape)
 
     env = ImageToPyTorch(env)
     #print(env.observation_space.shape)
 
-    env = BufferWrapper(env, 6, 'tensors3.pkl')
+    env = BufferWrapper(env, 6, 'tensors5.pkl')
 
     env = StoreData(env)
 

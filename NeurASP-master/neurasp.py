@@ -2,6 +2,7 @@ import pickle
 import re
 import sys
 import time
+import csv
 
 import clingo
 import torch
@@ -22,7 +23,17 @@ class NeurASP(object):
         @param gpu: a Boolean denoting whether the user wants to use GPU for training and testing
         """
         # misschien moet ik gpu hier verwijderen voor mps
-        self.device = device = ("cuda" if torch.cuda.is_available() and gpu else "mps" if torch.backends.mps.is_available() and gpu else "cpu")
+        if torch.backends.mps.is_available():
+            # mps_device = torch.device(self.device)
+            print("Using mps device.")
+            self.device = 'cpu'
+        elif torch.cuda.is_available():
+            device_name = torch.cuda.get_device_name(1)
+            print("Using CUDA device:", device_name)
+            self.device = 'cuda:1'
+        else:
+            print("CUDA is not available")
+            self.device = 'cpu'
 
         self.dprogram = dprogram
         self.const = {} # the mapping from c to v for rule #const c=v.
@@ -47,6 +58,15 @@ class NeurASP(object):
         self.mvpp['program'], self.mvpp['program_pr'], self.mvpp['program_asp'] = self.parse(obs='')
         self.stableModels = [] # a list of stable models, where each stable model is a list
 
+        with open('/Users/maximvandecasteele/PycharmProjects/NeurASP/Object_detector/data_neurasp/tensors_test.pkl',
+                  'rb') as f:
+            # Load the data from the pickle file
+            self.tensors_test = pickle.load(f)
+
+        with open('/Users/maximvandecasteele/PycharmProjects/NeurASP/Object_detector/data_neurasp/symbols_test_SM.pkl',
+                  'rb') as f:
+            # Load the data from the pickle file
+            self.symbols_test = pickle.load(f)
 
 
     def constReplacement(self, t):
@@ -289,7 +309,7 @@ class NeurASP(object):
                         # if data maps t to dataTensor directly
                         else:
                             dataTensor = data[t]
-
+                        # PΠ(mi(t)=vj) = M(D(t))[i,j]
                         nnOutput[m][t] = self.nnMapping[m](dataTensor.to(self.device))
                         nnOutput[m][t] = torch.clamp(nnOutput[m][t], min=10e-8, max=1.-10e-8)
 
@@ -359,19 +379,34 @@ class NeurASP(object):
                     for ruleIdx in range(self.mvpp['nnPrRuleNum']):
                         for probIdx, (m, i, t, j) in enumerate(self.mvpp['nnProb'][ruleIdx]):
                             self.nnGradients[m][t][i*self.n[m]+j] = (alpha - 1) * gradientsNN[ruleIdx][probIdx]
-                    # Step 2.5: backpropogate TODO msp device changes
+                    # Step 2.5: backpropogate
                     for m in nnOutput:
-                        for t in nnOutput[m]:
-                            if self.device == 'cuda':
-                                nnOutput[m][t].backward(torch.cuda.FloatTensor(np.reshape(np.array(self.nnGradients[m][t]),nnOutput[m][t].shape)), retain_graph=True)
-                            else:
-                                nnOutput[m][t].backward(torch.FloatTensor(np.reshape(np.array(self.nnGradients[m][t]),nnOutput[m][t].shape)), retain_graph=True)
+                        # for t in nnOutput[m]:
+                        #     if self.device == 'cuda':
+                        #         tensor = torch.cuda.FloatTensor(np.reshape(np.array(self.nnGradients[m][t]),nnOutput[m][t].shape),device=self.device)
+                        #         nnOutput[m][t].backward(tensor, retain_graph=True)
+                        #     else:
+                        #         tensor = torch.tensor(np.reshape(np.array(self.nnGradients[m][t]),nnOutput[m][t].shape), dtype=torch.float32, device=self.device)
+                        #         nnOutput[m][t].backward(tensor, retain_graph=True)
+                            for t in nnOutput[m]:
+                                if self.device == 'cuda':
+                                    nnOutput[m][t].backward(torch.cuda.FloatTensor(
+                                        np.reshape(np.array(self.nnGradients[m][t]), nnOutput[m][t].shape)),
+                                                            retain_graph=True)
+                                else:
+                                    nnOutput[m][t].backward(torch.FloatTensor(
+                                        np.reshape(np.array(self.nnGradients[m][t]), nnOutput[m][t].shape)),
+                                                            retain_graph=True)
 
                 # Step 3: update the parameters
                 if (dataIdx+1) % batchSize == 0:
                     for m in self.optimizers:
                         self.optimizers[m].step()
                         self.optimizers[m].zero_grad()
+
+                # for m in self.nnMapping:
+                #     if dataIdx % 500 == 0:
+                #      self.testNN(self.nnMapping[m], self.tensors_test, self.symbols_test, False)
 
                 # Step 4: if alpha is less than 1, we update probabilities in normal prob. rules
                 if alpha < 1:
@@ -381,7 +416,8 @@ class NeurASP(object):
                             ruleIdxMVPP = self.mvpp['nnPrRuleNum']+ruleIdx
                             for atomIdx, b in enumerate(dmvpp.learnable[ruleIdxMVPP]):
                                 if b == True:
-                                    dmvpp.parameters[ruleIdxMVPP][atomIdx] += lr * gradientsNormal[ruleIdx][atomIdx]
+                                    # gradient ascent (changed into gradient descent)
+                                    dmvpp.parameters[ruleIdxMVPP][atomIdx] -= lr * gradientsNormal[ruleIdx][atomIdx]
                         dmvpp.normalize_probs()
                         self.normalProbs = dmvpp.parameters[self.mvpp['nnPrRuleNum']:]
 
@@ -395,43 +431,52 @@ class NeurASP(object):
                 with open(smPickle, 'wb') as fp:
                     pickle.dump(self.stableModels, fp)
                 savePickle = False
-            # TODO save interval
+
             for m in self.nnMapping:
                 model = self.nnMapping[m]
                 torch.save(model.state_dict(), "/Users/maximvandecasteele/PycharmProjects/NeurASP/NeurASP-master/models/pre/neurasp_" + str(epochIdx) + "_model.pt")
-    def testNN(self, nn, testLoader):
+                accuracy = self.testNN(model,self.tensors_test,self.symbols_test)
+                # if epochIdx % 9 == 0:
+                #     torch.save(model.state_dict(), "/Users/maximvandecasteele/PycharmProjects/NeurASP/NeurASP-master/models/pre/neurasp_" + str(epochIdx) + "_model.pt")
+                self.write_to_csv('models/pre/test.csv', [epochIdx, accuracy])
+                print(f'Test accuracy at epoch {epochIdx}: {accuracy}')
+
+    def write_to_csv(self, filename, data):
+        with open(filename, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(data)
+
+    def testNN(self, nn, tensors_test, symbols_test):
         """
         Return a real number in [0,100] denoting accuracy
         @nn is the name of the neural network to check the accuracy. 
         @testLoader is the input and output pairs.
         """
-        self.nnMapping[nn].eval()
+
+        # nn.eval()
         # check if total prediction is correct
-        correct = 0
+        incorrect = 0
         total = 0
         # check if each single prediction is correct
         singleCorrect = 0
         singleTotal = 0
-        with torch.no_grad():
-            for data, target in testLoader:
-                output = self.nnMapping[nn](data.to(self.device))
-                if target.shape == output.shape[:-1]:
-                    pred = output.argmax(dim=-1) # get the index of the max value
-                elif target.shape == output.shape:
-                    pred = (output >= 0.5).int()
-                else:
-                    print(f'Error: none considered case for output with shape {output.shape} v.s. label with shape {target.shape}')
-                    sys.exit()
-                target = target.to(self.device).view_as(pred)
-                correctionMatrix = (target.int() == pred.int()).view(target.shape[0], -1)
-                correct += correctionMatrix.all(1).sum().item()
-                total += target.shape[0]
-                singleCorrect += correctionMatrix.sum().item()
-                singleTotal += target.numel()
 
-        accuracy = 100. * correct / total
-        singleAccuracy = 100. * singleCorrect / singleTotal
-        return accuracy, singleAccuracy
+        indices = len(tensors_test)
+
+        for index in range(indices):
+            tensor = tensors_test[index]['state'].to(self.device)
+            symbols = symbols_test[index]
+
+            output = nn(tensor)
+            pred = output.argmax(dim=-1)
+
+            incorrect += 1 if pred not in symbols else False
+            total += 1
+
+            accuracy = 100. * (total - incorrect) / total
+
+
+        return accuracy
     
     # We interpret the most probable stable model(s) as the prediction of the inference mode
     # and check the accuracy of the inference mode by checking whether the obs is satisfied by the prediction

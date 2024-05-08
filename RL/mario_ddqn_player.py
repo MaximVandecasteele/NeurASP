@@ -44,11 +44,11 @@ config = {
     'input_type': 'asp',
     'inference_type': 'pure',
     'train': True,
-    'exp_r': 0.02,
+    'exp_r': 0.2,
     'num_runs': 5,
     'epochs': 100,
-    'working_dir': 'training_run_baseline/Models_asp/run_3/',
-    'model': 'run3_5000best_performer_',
+    'working_dir': '/Users/maximvandecasteele/PycharmProjects/NeurASP/NeurASP-master/models/success/',
+    'model': 'neurasp_29_model.pt',
     'pretrained_weights': True,
     'load_experience_replay': False,
     'save_experience_replay': False,
@@ -174,10 +174,11 @@ def run(asp, pretrained):
             
             #What action would the agent perform
             action = agent.act(state)
+            act = action[0][0]
             #Increase step number
             steps += 1
             #Perform the action and advance to the next state
-            state_next, reward, terminal, info = env.step(int(action[0]))
+            state_next, reward, terminal, info = env.step(int(action[0][0]))
             #Update total reward
             total_reward += reward
             #Change to next state

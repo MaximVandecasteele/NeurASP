@@ -21,7 +21,7 @@ class DQNSolver_asp(nn.Module):
             nn.Linear(conv_out_size, 512),
             nn.ReLU(),
             nn.Linear(512, n_actions),
-            nn.Softmax()
+            # nn.Softmax(dim=0)
         )
 
         self.gradients = None

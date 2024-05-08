@@ -40,9 +40,9 @@ class DQNAgent:
 
         if self.pretrained:
             self.local_net.load_state_dict(
-                torch.load(savepath + pretrained_model_name + "dq1.pt", map_location=torch.device(self.device)))
+                torch.load(savepath + pretrained_model_name, map_location=torch.device(self.device)))
             self.target_net.load_state_dict(
-                torch.load(savepath + pretrained_model_name + "dq2.pt", map_location=torch.device(self.device)))
+                torch.load(savepath + pretrained_model_name, map_location=torch.device(self.device)))
 
         self.optimizer = torch.optim.Adam(self.local_net.parameters(), lr=lr)
         self.copy = 1000  # Copy the local model weights into the target network every 1000 steps

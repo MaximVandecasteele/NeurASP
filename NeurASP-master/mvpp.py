@@ -102,6 +102,12 @@ class MVPP(object):
                     self.parameters[ruleIdx][atomIdx] = self.parameters[ruleIdx][atomIdx] / summation * self.remain_probs[ruleIdx]
         return True
 
+
+    #
+    #         Product of PΠ(c=v) c=v∈I|σnn     if I is a stable model of Π;
+    # PΠ(I) = ıNum(I|σnn ,Π)
+    #
+    #                0               otherwise.
     def prob_of_interpretation(self, I):
         prob = 1.0
         # I must be a list of atoms, where each atom is a string

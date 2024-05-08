@@ -13,13 +13,18 @@ from RL.DQN_network_asp import testNN
 
 start_time = time.time()
 
-if torch.cuda.is_available():
+if torch.backends.mps.is_available():
+    # mps_device = torch.device(self.device)
+    print("Using mps device.")
+    device = 'cpu'
+elif torch.cuda.is_available():
     device_name = torch.cuda.get_device_name(1)
     print("Using CUDA device:", device_name)
     device = 'cuda:1'
 else:
     print("CUDA is not available")
     device = 'cpu'
+
 
 #############################
 # Load the training and testing data
@@ -47,29 +52,55 @@ with open('/Users/maximvandecasteele/PycharmProjects/NeurASP/Object_detector/dat
 # NeurASP program
 #############################
 
+dprogram1 = '''
+nn(dqn(1,state),[0,1,2,3,4]). 
+
+:- dqn(0,state,1), cell(R1, C1, 1), cell(R2, C2, 3), R1 = R2, C2 <= C1 + 2, C2 > C1.
+:- dqn(0,state,3), cell(R1, C1, 1), cell(R2, C2, 3), R1 = R2, C2 <= C1 + 2, C2 > C1.
+:- dqn(0,state,0), cell(R1, C1, 1), cell(R2, C2, 3), R1 = R2, C2 <= C1 + 2, C2 > C1.
+
+:- dqn(0,state,1), cell(R1, C1, 1), cell(13, C1 + 1, 4), not protected.
+:- dqn(0,state,3), cell(R1, C1, 1), cell(13, C1 + 1, 4), not protected.
+protected :- cell(R1, C1, 1), cell(R2, C1 + 1, 2), R2 > R1.
+
+:- dqn(0,state,1), cell(R1, C1, 1), cell(R2, C2, 2), R1 = R2, C1 + 1 = C2.
+:- dqn(0,state,3), cell(R1, C1, 1), cell(R2, C2, 2), R1 = R2, C1 + 1 = C2.
+
+:- dqn(0,state,1), cell(R1, C1, 1), cell(R2, C2, 5), R1 = R2, C1 + 1 = C2.
+:- dqn(0,state,3), cell(R1, C1, 1), cell(R2, C2, 5), R1 = R2, C1 + 1 = C2.
+
+:- dqn(0,state,1), cell(R1, C1, 1), cell(R2, C2, 6), R1 = R2, C1 + 1 = C2.
+:- dqn(0,state,3), cell(R1, C1, 1), cell(R2, C2, 6), R1 = R2, C1 + 1 = C2.
+
+:- dqn(0,state,0), cell(R1, C1, 1), cell(R2, C2, 2), R1 = R2, C1 + 1 = C2.
+:- dqn(0,state,0), cell(R1, C1, 1), cell(R2, C2, 5), R1 = R2, C1 + 1 = C2.
+:- dqn(0,state,0), cell(R1, C1, 1), cell(R2, C2, 6), R1 = R2, C1 + 1 = C2.
+
+:- dqn(0,state,2), cell(R1, C1, 1), cell(R2, C2, 3), R1 = R2, C1 + 7 = C2.
+:- dqn(0,state,2), cell(R1, C1, 1), cell(R2, C2, 4), R1 + 1 = R2, C1 + 7 = C2.
+
+:- dqn(0,state,4).
+'''
+
+
 dprogram = '''
 nn(dqn(1,state),[0,1,2,3,4]). 
 
-:- dqn(1,state,1), cell(R1, C1, 1), cell(R2, C2, 3), R1 = R2, C2 <= C1 + 2, C2 > C1.
-:- dqn(1,state,3), cell(R1, C1, 1), cell(R2, C2, 3), R1 = R2, C2 <= C1 + 2, C2 > C1.
-:- dqn(1,state,0), cell(R1, C1, 1), cell(R2, C2, 3), R1 = R2, C2 <= C1 + 2, C2 > C1.
-
-:- dqn(1,state,1), cell(R1, C1, 1), cell(13, C1 + 1, 4), not protected.
-:- dqn(1,state,3), cell(R1, C1, 1), cell(13, C1 + 1, 4), not protected.
 protected :- cell(R1, C1, 1), cell(R2, C1 + 1, 2), R2 > R1.
+jump :- cell(R1, C1, 1), cell(R2, C2, 3), R1 = R2, C2 <= C1 + 2, C2 > C1.
+jump :- cell(R1, C1, 1), cell(13, C1 + 1, 4), not protected.
+jump :- cell(R1, C1, 1), cell(R2, C2, 2), R1 = R2, C1 + 1 = C2.
+jump :- cell(R1, C1, 1), cell(R2, C2, 5), R1 = R2, C2 >= C1 + 1, C2 <= C1 + 2. 
+jump :- cell(R1, C1, 1), cell(R2, C2, 6), R1 = R2, C1 + 1 = C2.
+jump :- cell(R1, C1, 1), not cell(R1 + 1, C1, _). 
 
-:- dqn(1,state,1), cell(R1, C1, 1), cell(R2, C2, 2), R1 = R2, C1 + 1 = C2.
-:- dqn(1,state,3), cell(R1, C1, 1), cell(R2, C2, 2), R1 = R2, C1 + 1 = C2.
+:- dqn(0,state,1), jump. 
 
-:- dqn(1,state,1), cell(R1, C1, 1), cell(R2, C2, 5), R1 = R2, C1 + 1 = C2.
-:- dqn(1,state,3), cell(R1, C1, 1), cell(R2, C2, 5), R1 = R2, C1 + 1 = C2.
+:- dqn(0,state,2), not jump.
 
-:- dqn(1,state,1), cell(R1, C1, 1), cell(R2, C2, 6), R1 = R2, C1 + 1 = C2.
-:- dqn(1,state,3), cell(R1, C1, 1), cell(R2, C2, 6), R1 = R2, C1 + 1 = C2.
-
-:- dqn(1,state,0), cell(R1, C1, 1), cell(R2, C2, 2), R1 = R2, C1 + 1 = C2.
-:- dqn(1,state,0), cell(R1, C1, 1), cell(R2, C2, 5), R1 = R2, C1 + 1 = C2.
-:- dqn(1,state,0), cell(R1, C1, 1), cell(R2, C2, 6), R1 = R2, C1 + 1 = C2.
+:- dqn(0,state,0).
+:- dqn(0,state,3). 
+:- dqn(0,state,4).
 '''
 
 ########
@@ -78,7 +109,7 @@ protected :- cell(R1, C1, 1), cell(R2, C1 + 1, 2), R2 > R1.
 
 m = DQNSolver_asp((6, 15, 16), 5).to(device)
 nnMapping = {'dqn': m}
-optimizers = {'dqn': torch.optim.Adam(m.parameters(), lr=0.001)}
+optimizers = {'dqn': torch.optim.Adam(m.parameters(), lr=0.000001)}
 NeurASPobj = NeurASP(dprogram, nnMapping, optimizers)
 
 ########
@@ -86,7 +117,7 @@ NeurASPobj = NeurASP(dprogram, nnMapping, optimizers)
 ########
 
 print('Start training for 1 epoch...')
-NeurASPobj.learn(dataList=dataList, obsList=obsList, epoch=5, smPickle=None, bar=True)
+NeurASPobj.learn(dataList=dataList, obsList=obsList, epoch=100, smPickle=None, bar=True)
 
 # # check testing accuracy
 accuracy = testNN(model=m, tensors_test=tensors_test, symbols_test=symbols_test, device=device)

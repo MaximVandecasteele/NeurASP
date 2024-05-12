@@ -1,7 +1,7 @@
 import random
 import torch
-from DQN_network_vanilla import DQNSolver
-from DQN_network_asp import DQNSolver_asp
+from RL.DQN_network_vanilla import DQNSolver
+from RL.DQN_network_asp import DQNSolver_asp
 import pickle
 import torch.nn as nn
 

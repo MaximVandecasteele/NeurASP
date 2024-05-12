@@ -26,7 +26,7 @@ import collections
 import cv2
 import matplotlib.pyplot as plt
 from IPython import display
-from segmentator import Segmentator
+
 from gym_wrappers import MaxAndSkipEnv, ProcessFrame, ImageToPyTorch, ScaledFloatFrame, BufferWrapper
 from DQN_network_vanilla import DQNSolver
 from DQNAgent import DQNAgent
@@ -44,10 +44,11 @@ config = {
     'input_type': 'asp',
     'inference_type': 'pure',
     'train': True,
-    'exp_r': 0.2,
+    'exp_r': 0.1,
     'num_runs': 5,
     'epochs': 100,
-    'working_dir': '/Users/maximvandecasteele/PycharmProjects/NeurASP/NeurASP-master/models/success/',
+    'working_dir': '/Users/maximvandecasteele/PycharmProjects/NeurASP/NeurASP/models/neurasp_lonely/run_1/',
+    # 4 werkte heel goed
     'model': 'neurasp_29_model.pt',
     'pretrained_weights': True,
     'load_experience_replay': False,
@@ -56,6 +57,9 @@ config = {
 asp = False
 if config['input_type'] == 'asp':
     asp = True
+
+
+
 
 ### Run settings.
 training = config['train']
@@ -174,7 +178,6 @@ def run(asp, pretrained):
             
             #What action would the agent perform
             action = agent.act(state)
-            act = action[0][0]
             #Increase step number
             steps += 1
             #Perform the action and advance to the next state

@@ -14,7 +14,7 @@ from RL.symbolic_components.positioner import Positioner
 from RL.symbolic_components.detector import Detector
 import torch
 
-from RL.segmentator import Segmentator
+
 
 
 ##### Setting up Mario environment #########
@@ -84,9 +84,8 @@ class ProcessFrame(gym.ObservationWrapper):
         else:
             self.observation_space = gym.spaces.Box(low=0, high=255, shape=(84, 84, 1), dtype=np.uint8)
 
-        if self.input_type == 'ss':
-            self.segmentator = Segmentator()
-        elif self.input_type == 'asp':
+
+        if self.input_type == 'asp':
             self.detector = Detector(config)
             self.positioner = Positioner(config)
 
@@ -263,13 +262,13 @@ def make_neurasp_env(env):
     input_type = 'asp'
     env = MaxAndSkipEnv(env)
     #print(env.observation_space.shape)
-    env = ProcessFrame(input_type, 'symbols5.csv', env)
+    env = ProcessFrame(input_type, 'symbols6.csv', env)
     #print(env.observation_space.shape)
 
     env = ImageToPyTorch(env)
     #print(env.observation_space.shape)
 
-    env = BufferWrapper(env, 6, 'tensors5.pkl')
+    env = BufferWrapper(env, 6, 'tensors6.pkl')
 
     env = StoreData(env)
 

@@ -8,7 +8,7 @@ from RL.symbolic_components.positioner import Positioner
 from RL.symbolic_components.detector import Detector
 import torch
 
-from RL.segmentator import Segmentator
+
 
 
 ##### Setting up Mario environment #########
@@ -72,9 +72,7 @@ class ProcessFrame(gym.ObservationWrapper):
         else:
             self.observation_space = gym.spaces.Box(low=0, high=255, shape=(84, 84, 1), dtype=np.uint8)
 
-        if self.input_type == 'ss':
-            self.segmentator = Segmentator()
-        elif self.input_type == 'asp':
+        if self.input_type == 'asp':
             self.detector = Detector(config)
             self.positioner = Positioner(config)
 

@@ -76,10 +76,6 @@ with open('/Object_detector/data_neurasp/balanced_dataset/symbols_test_SM.pkl',
 # :- dqn(0,state,0), cell(R1, C1, 1), cell(R2, C2, 5), R1 = R2, C1 + 1 = C2.
 # :- dqn(0,state,0), cell(R1, C1, 1), cell(R2, C2, 6), R1 = R2, C1 + 1 = C2.
 #
-# :- dqn(0,state,2), cell(R1, C1, 1), cell(R2, C2, 3), R1 = R2, C1 + 7 = C2.
-# :- dqn(0,state,2), cell(R1, C1, 1), cell(R2, C2, 4), R1 + 1 = R2, C1 + 7 = C2.
-#
-# :- dqn(0,state,4).
 # '''
 
 

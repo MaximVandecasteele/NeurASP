@@ -78,9 +78,9 @@ class ProcessFrame(gym.ObservationWrapper):
         if self.input_type == 'asp':
             self.observation_space = gym.spaces.Box(low=0, high=255, shape=(15, 16, 1), dtype=np.uint8)
             # Create a CSV file if it doesn't exist and write the header
-            with open(self.filename, mode='w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow(['current_facts'])  # Header
+            # with open(self.filename, mode='w', newline='') as file:
+            #     writer = csv.writer(file)
+            #     writer.writerow(['current_facts'])  # Header
         else:
             self.observation_space = gym.spaces.Box(low=0, high=255, shape=(84, 84, 1), dtype=np.uint8)
 
@@ -112,7 +112,7 @@ class ProcessFrame(gym.ObservationWrapper):
                 positions = self.detector.detect(frame)
                 cell_list = self.positioner.position(positions)
                 data = [" ".join(cell_list)]
-                self.write_to_csv(self.filename, data)
+                # self.write_to_csv(self.filename, data)
                 img = self.convert_ASP_cells_to_matrix(cell_list, (15, 16, 1))
                 x_t = np.uint8(img * 255 / 6)
 
@@ -192,8 +192,8 @@ class BufferWrapper(gym.ObservationWrapper):
         tensor = torch.tensor(self.buffer)
         self.tensors.append(tensor)
 
-        with open(self.file_name, 'wb') as f:
-            pickle.dump(self.tensors, f)
+        # with open(self.file_name, 'wb') as f:
+        #     pickle.dump(self.tensors, f)
 
 
         return self.buffer
@@ -254,7 +254,7 @@ class CaptureFrames(ObservationWrapper):
 
 def apply_img_capture_wrappers(env, env_name):
     # env = SkipFrame(env, skip=4)  # Num of frames to apply one action to
-    env = CaptureFrames(env, env_name)  # intercept image and convert to object positions
+    # env = CaptureFrames(env, env_name)  # intercept image and convert to object positions
     return env
 
 
@@ -262,13 +262,13 @@ def make_neurasp_env(env):
     input_type = 'asp'
     env = MaxAndSkipEnv(env)
     #print(env.observation_space.shape)
-    env = ProcessFrame(input_type, 'symbols6.csv', env)
+    env = ProcessFrame(input_type, 'symbols_naive.csv', env)
     #print(env.observation_space.shape)
 
     env = ImageToPyTorch(env)
     #print(env.observation_space.shape)
 
-    env = BufferWrapper(env, 6, 'tensors6.pkl')
+    env = BufferWrapper(env, 6, 'tensors_naive.pkl')
 
     env = StoreData(env)
 

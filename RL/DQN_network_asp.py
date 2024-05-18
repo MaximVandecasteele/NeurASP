@@ -22,7 +22,7 @@ class DQNSolver_asp(nn.Module):
             nn.ReLU(),
             nn.Linear(512, n_actions),
             # only for neurasp purposes, otherwise comment out the softmax
-            nn.Softmax(dim=0)
+            # nn.Softmax(dim=0)
         )
 
         self.gradients = None
@@ -35,8 +35,8 @@ class DQNSolver_asp(nn.Module):
         conv_out = self.conv(x)
 
         conv_out.register_hook(self.activations_hook)
-        # reshape = conv_out.view(x.size()[0], -1)
-        reshape = conv_out.view(3584)
+        reshape = conv_out.view(x.size()[0], -1)
+        # reshape = conv_out.view(3584)
         return self.fc(reshape)
 
     def activations_hook(self, grad):

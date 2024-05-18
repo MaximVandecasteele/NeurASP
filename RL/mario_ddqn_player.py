@@ -47,9 +47,9 @@ config = {
     'exp_r': 0.1,
     'num_runs': 5,
     'epochs': 100,
-    'working_dir': '/Users/maximvandecasteele/PycharmProjects/NeurASP/NeurASP/models/neurasp_lonely/run_1/',
+    'working_dir': '/Users/maximvandecasteele/PycharmProjects/NeurASP/Evaluation/training_run_baseline/Models_asp/run_5/',
     # 4 werkte heel goed
-    'model': 'neurasp_29_model.pt',
+    'model': 'run5_5000best_performer_dq1.pt',
     'pretrained_weights': True,
     'load_experience_replay': False,
     'save_experience_replay': False,

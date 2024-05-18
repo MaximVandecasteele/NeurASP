@@ -1,3 +1,4 @@
+run,model,step,reward,flag
 1,0,1,248.0,False
 1,0,2,626.0,False
 1,0,3,608.0,False

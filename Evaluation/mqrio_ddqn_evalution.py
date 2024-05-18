@@ -38,7 +38,7 @@ import os
 
 config = {
     'vis': False,
-    'level': '1-1',
+    'level': '2-1',
     'tensorboard' : True,
     # asp or rgb
     'input_type': 'asp',
@@ -76,8 +76,8 @@ input_type = config['input_type']
 ##Training settings:
 if training ==  False:
     if inference_type == 'pure':
-        max_exploration_rate = 0.02
-        min_exploration_rate = 0.02
+        max_exploration_rate = 0.2
+        min_exploration_rate = 0.2
     else:
         max_exploration_rate = min_exp_r
         min_exploration_rate = min_exp_r
@@ -159,7 +159,7 @@ def run(asp, pretrained):
     observation_space = env.observation_space.shape
     action_space = env.action_space.n
 
-    csv_file_path = f'data_performance_neurasp_post_1e-06.csv'
+    csv_file_path = f'data_generalization_neurasp_post_1e-06.csv'
 
     if not os.path.isfile(csv_file_path):
         with open(csv_file_path, mode='w', newline='') as file:
@@ -192,7 +192,7 @@ def run(asp, pretrained):
 
                 #If using tensorboard initialize summary_writer
                 if use_tensorboard == True:
-                    tensorboard_writer = SummaryWriter(f'training_run_neurasp_post/tensorboard_performance/neurasp_post_performance/run{m + 1}_1e-06_model{e}')
+                    tensorboard_writer = SummaryWriter(f'training_run_neurasp_post/tensorboard_generalization/neurasp_post_generalization/run{m + 1}_1e-06_model{e}')
 
                 #Each iteration is an episode (epoch)
                 for ep_num in range(epochs):

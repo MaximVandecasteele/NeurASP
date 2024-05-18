@@ -76,15 +76,15 @@ cell(Y1, X1, C) :- object(C,X,Y), X1 = X / 16, X2 = X \ 16, X2 != 0,
                                     Y1 = Y / 16, Y2 = Y \ 16, Y2 != 0,
                                     Y1 < 15, Y1 >= 0, X1 >= 0, X1 < 16.
 
-cell(Y1, X1 + 1, C) :- object(C,X,Y), X1 = X / 16, X2 = X \ 16, X2 = 0,
+cell(Y1, X1, C) :- object(C,X,Y), X1 = X / 16, X2 = X \ 16, X2 = 0,
                                     Y1 = Y / 16, Y2 = Y \ 16, Y2 != 0,
                                     Y1 < 15, Y1 >= 0, X1 >= 0, X1 < 15.
 
-cell(Y1 + 1, X1, C) :- object(C,X,Y), X1 = X / 16, X2 = X \ 16, X2 != 0,
+cell(Y1 , X1, C) :- object(C,X,Y), X1 = X / 16, X2 = X \ 16, X2 != 0,
                                     Y1 = Y / 16, Y2 = Y \ 16, Y2 = 0,
                                     Y1 < 14, Y1 >= 0, X1 >= 0, X1 < 15.
 
-cell(Y1 + 1, X1 + 1, C) :- object(C,X,Y), X1 = X / 16, X2 = X \ 16, X2 = 0,
+cell(Y1 , X1 , C) :- object(C,X,Y), X1 = X / 16, X2 = X \ 16, X2 = 0,
                                    Y1 = Y / 16, Y2 = Y \ 16, Y2 = 0,
                                    Y1 < 14, Y1 >= 0, X1 >= 0, X1 < 15.
 
@@ -104,9 +104,9 @@ cell(R,C,5) :- pipe(XMIN,XMAX,YMIN,YMAX), center_cell(R,C,XC,YC), XC >= XMIN, XC
 cell(R,C,6) :- wall(XMIN,XMAX,YMIN,YMAX), center_cell(R,C,XC,YC), XC >= XMIN, XC <= XMAX, YC <= YMAX, YC >= YMIN.
 
 
-%mario(110,126,167,183).
+%mario(115,132,180,197).
 %ground(0,254,207,240).
 %goomba(232,249,192,208).
 %pipe(251,255,143,206).
 
-%#show cell/3.
+

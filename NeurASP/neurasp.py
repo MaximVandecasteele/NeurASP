@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 from mvpp import MVPP
 
+# https://github.com/azreasoners/NeurASP
 
 class NeurASP(object):
     def __init__(self, dprogram, nnMapping, optimizers, run, lr, gpu=False):

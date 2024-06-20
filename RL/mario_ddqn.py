@@ -1,161 +1,81 @@
-#Code modified from [on the Paperspace blog](https://blog.paperspace.com/building-double-deep-q-network-super-mario-bros/).
-
+#  https://github.com/Montyro/MarioSSRL
 ## Install the following if on a new instance, otherwise they'll ship with the container.
 # !pip install nes-py==0.2.6
 # !pip install gym-super-mario-bros
 # !apt-get update
 # !apt-get install ffmpeg libsm6 libxext6  -y
 
+
+
+
 import csv
-from ast import parse
-from turtle import back
 import torch
-import torch.nn as nn
-import random
 import gym_super_mario_bros
-from nes_py.wrappers import JoypadSpace
-from torch.serialization import save
 from tqdm import tqdm
 import pickle 
-
-from gym_super_mario_bros.actions import RIGHT_ONLY
-
-import gym
+from Environment.gym_wrappers import make_env
 import numpy as np
-import collections 
 import cv2
 import matplotlib.pyplot as plt
-from IPython import display
-from segmentator import Segmentator
-from gym_wrappers import MaxAndSkipEnv, ProcessFrame, ImageToPyTorch, ScaledFloatFrame, BufferWrapper
-from DQN_network_vanilla import DQNSolver
 from DQNAgent import DQNAgent
-
-
-# Argparse
-
-import argparse
+from Configuration.config import config_rgb
 import os
-parser = argparse.ArgumentParser()
-#Run settings:
-parser.add_argument("-vis","--visualization",help="Visualize the game screen",action='store_true', default=False)
-parser.add_argument("--level",help="What level to play",type=str,default="1-1")
-parser.add_argument("--tensorboard",help="Log to tensorboard. Default = True",default=True)
-parser.add_argument("--run_name",help="A name for the run. Used in tensorboard. Defaults to Test",type=str,default="Test")
-parser.add_argument("-it","--input_type",help="Wether to use semantic segmentation (ss), (asp) or normal RGB frames (rgb).",type=str,default="asp")
-parser.add_argument("-inf","--inference_type",help="Wether to run inference with no randomness or maintain a small randomness amount. Can be pure or random",type=str,default='pure')
 
-#Training settings
-parser.add_argument("-t","--train",help="Training mode",action='store_true',default=True)
-parser.add_argument("--max_exp_r",help="Max exploration rate. Defaults to 1", type=float,default=1.0)
-parser.add_argument("--min_exp_r",help="Min_exp_rate minimum value for exploration rate",type=float,default=0.02) #if set to 0, it will stop exploring and probably plateau.
-parser.add_argument("-e","--epochs",help="Amount of epochs to train for.",type=int,default=5000)
-parser.add_argument("-bue","--backup_epochs",help="Backups every e epochs.",type=int,default=100)
-parser.add_argument("-sgm","--save_good_model",help="If a model outperforms X times in a row, save it just in case.",type=int,default=-1)
-
-#Model saving and loading
-parser.add_argument("-wd","--working_dir",help='Where will files be stored to and loaded from',type=str,default="Models_asp_mac") #required=True
-parser.add_argument("-pt","--pretrained_weights",help="Use a pretrained model. Defaults to False",action='store_true', default=False)
-parser.add_argument("-mn","--model_name",help="Name of the model to load (if different from default)",type=str, default="")
-
-
-#Other files that can be saved:
-parser.add_argument("--load_experience_replay",help="Load a previously saved experience replay dataset. Defaults to false",type=bool,default=False)
-parser.add_argument("--save_experience_replay",help="Save the experience replay dataset.Defaults to False. WARNING: Test to 1 or 2 epochs before fully training, or it may give error when saving.",type=bool,default=False)
-
-#parser.add_argument("-h","--help",help="Prints this command and exit",action="store_true")
-
-args = parser.parse_args()
+# Choose between config_rgb, config_asp
+configuration = config_rgb
 
 ### Run settings.
-training = args.train
-vis = args.visualization
-level = args.level
-use_tensorboard = args.tensorboard
+training = configuration['train']
+vis = configuration['vis']
+level = configuration['level']
+use_tensorboard = configuration['tensorboard']
 
 if use_tensorboard:
     from torch.utils.tensorboard import SummaryWriter
 
-run_name = args.run_name
+run_name = configuration['run_name']
 
-if args.input_type == 'ss':
-    input_type = 'ss'
-    # segmentator = Segmentator() #Load segmentation model
-elif args.input_type == 'asp':
+run_number = 1
+
+if configuration['input_type'] == 'asp':
     input_type = 'asp'
 else:
     input_type = 'rgb'
 
 ##Training settings:
-if args.train ==  False:
-    if args.inference_type == 'pure':
+if configuration['train'] ==  False:
+    if configuration['inference_type'] == 'pure':
         max_exploration_rate = 0
         min_exploration_rate = 0
     else:
-        max_exploration_rate = args.min_exp_r
-        min_exploration_rate = args.min_exp_r
+        max_exploration_rate = configuration['min_exp_r']
+        min_exploration_rate = configuration['min_exp_r']
 else:
-    max_exploration_rate = args.max_exp_r
-    min_exploration_rate = args.min_exp_r
+    max_exploration_rate = configuration['max_exp_r']
+    min_exploration_rate = configuration['max_exp_r']
 
-epochs = args.epochs
+epochs = configuration['epochs']
 
-if args.backup_epochs > 0:
-    backup_interval = args.backup_epochs
+if configuration['backup_epochs'] > 0:
+    backup_interval = configuration['backup_epochs']
 else:
     backup_interval = -1
 
-save_good_model = args.save_good_model
+save_good_model = configuration['save_good_model']
 #Model saving and loading
 #Is there a directory for models? otherwise create it
-dir_exist = os.path.exists(args.working_dir) and os.path.isdir(args.working_dir)
+dir_exist = os.path.exists(configuration['working_dir']) and os.path.isdir(configuration['working_dir'])
 if not dir_exist:
-    os.mkdir(args.working_dir)
-savepath = args.working_dir+'/'
+    os.mkdir(configuration['working_dir'])
+savepath = configuration['working_dir']+'/'
 
-pretrained_weights = args.pretrained_weights
-pretrained_model_name = args.model_name
+pretrained_weights = configuration['pretrained_weights']
+pretrained_model_name = configuration['model_name']
 
 #What to do with experience replay
-load_exp_rep = args.load_experience_replay
-save_exp_rep = args.save_experience_replay
+load_exp_rep = configuration['load_experience_replay']
+save_exp_rep = configuration['save_experience_replay']
 
-
-# ##### Setting up Mario environment #########
-#Create environment (wrap it in all wrappers)
-def make_env(env):
-    env = MaxAndSkipEnv(env)
-    #print(env.observation_space.shape)
-    env = ProcessFrame(input_type, env)
-    #print(env.observation_space.shape)
-
-    env = ImageToPyTorch(env)
-    #print(env.observation_space.shape)
-
-    env = BufferWrapper(env, 6)
-    #print(env.observation_space.shape)
-
-    env = ScaledFloatFrame(env)
-    #print(env.observation_space.shape)
-
-    return JoypadSpace(env, RIGHT_ONLY) #Fixes action sets
-
-def make_asp_env(env):
-    env = MaxAndSkipEnv(env)
-    #print(env.observation_space.shape)
-    env = ProcessFrame(input_type, env)
-    #print(env.observation_space.shape)
-
-    env = ImageToPyTorch(env)
-    #print(env.observation_space.shape)
-
-    env = BufferWrapper(env, 6)
-    #print(env.observation_space.shape)
-
-    env = ScaledFloatFrame(env)
-    #print(env.observation_space.shape)
-
-    return JoypadSpace(env, RIGHT_ONLY) #Fixes action sets
 
 def vectorize_action(action, action_space):
     # Given a scalar action, return a one-hot encoded action
@@ -169,11 +89,7 @@ def show_state(env, ep=0, info=""):
 def run(asp, training_mode, pretrained):
    
     env = gym_super_mario_bros.make('SuperMarioBros-'+level+'-v0') #Load level
-
-    if asp:
-        env = make_asp_env(env) # Wraps the environment so that frames are 15x16 ASP frames
-    else:
-        env = make_env(env)  # Wraps the environment so that frames are grayscale / segmented
+    env = make_env(env, input_type)  # Wraps the environment in order to function properly
 
     observation_space = env.observation_space.shape
     action_space = env.action_space.n
@@ -203,7 +119,7 @@ def run(asp, training_mode, pretrained):
     
     #If using tensorboard initialize summary_writer
     if use_tensorboard == True:
-        tensorboard_writer = SummaryWriter('tensorboard/'+run_name+"_labels")
+        tensorboard_writer = SummaryWriter(f'tensorboard_neurasp_pre/run_{run_number}/run{run_number}_labels')
 
     max_reward = 0
     current_counter = save_good_model
@@ -346,7 +262,7 @@ def run(asp, training_mode, pretrained):
     if training_mode == True:
         # File path to save CSV
         # csv_file_path = 'training_run_baseline/tensorboard_asp/csv/data_asp_run1.csv'
-        csv_file_path = 'data_asp_run1.csv'
+        csv_file_path = f'neurasp_pre_models/run{run_number}/data_asp_run{run_number}.csv'
         # Writing list to CSV
         with open(csv_file_path, 'w', newline='') as file:
             writer = csv.writer(file)
@@ -364,5 +280,8 @@ def run(asp, training_mode, pretrained):
 
 
 if __name__ == '__main__':
-    run(asp=True, training_mode=training, pretrained=pretrained_weights)
+    for i in range(5):
+        run_number = i + 1
+        savepath = f'/home/stefaan/local/python/NeurASP/RL/neurasp_pre_models/run{run_number}/'
+        run(asp=True, training_mode=training, pretrained=pretrained_weights)
 

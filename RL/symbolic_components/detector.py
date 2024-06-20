@@ -8,7 +8,6 @@ class Detector:
         super().__init__()
         self.model = YOLO(config["detector_model_path"])
         if torch.backends.mps.is_available():
-            # mps_device = torch.device(self.device)
             print("Using mps device.")
             self.device = 'mps'
         elif torch.cuda.is_available():

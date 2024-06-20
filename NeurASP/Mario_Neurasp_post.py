@@ -48,41 +48,6 @@ with open('/Users/maximvandecasteele/PycharmProjects/NeurASP/Object_detector/dat
     symbols_test = pickle.load(f)
 
 
-#############################
-# NeurASP program
-#############################
-
-# dprogram1 = '''
-# nn(dqn(1,state),[0,1,2,3,4]).
-#
-# :- dqn(0,state,1), cell(R1, C1, 1), cell(R2, C2, 3), R1 = R2, C2 <= C1 + 2, C2 > C1.
-# :- dqn(0,state,3), cell(R1, C1, 1), cell(R2, C2, 3), R1 = R2, C2 <= C1 + 2, C2 > C1.
-# :- dqn(0,state,0), cell(R1, C1, 1), cell(R2, C2, 3), R1 = R2, C2 <= C1 + 2, C2 > C1.
-#
-# :- dqn(0,state,1), cell(R1, C1, 1), cell(13, C1 + 1, 4), not protected.
-# :- dqn(0,state,3), cell(R1, C1, 1), cell(13, C1 + 1, 4), not protected.
-# protected :- cell(R1, C1, 1), cell(R2, C1 + 1, 2), R2 > R1.
-#
-# :- dqn(0,state,1), cell(R1, C1, 1), cell(R2, C2, 2), R1 = R2, C1 + 1 = C2.
-# :- dqn(0,state,3), cell(R1, C1, 1), cell(R2, C2, 2), R1 = R2, C1 + 1 = C2.
-#
-# :- dqn(0,state,1), cell(R1, C1, 1), cell(R2, C2, 5), R1 = R2, C1 + 1 = C2.
-# :- dqn(0,state,3), cell(R1, C1, 1), cell(R2, C2, 5), R1 = R2, C1 + 1 = C2.
-#
-# :- dqn(0,state,1), cell(R1, C1, 1), cell(R2, C2, 6), R1 = R2, C1 + 1 = C2.
-# :- dqn(0,state,3), cell(R1, C1, 1), cell(R2, C2, 6), R1 = R2, C1 + 1 = C2.
-#
-# :- dqn(0,state,0), cell(R1, C1, 1), cell(R2, C2, 2), R1 = R2, C1 + 1 = C2.
-# :- dqn(0,state,0), cell(R1, C1, 1), cell(R2, C2, 5), R1 = R2, C1 + 1 = C2.
-# :- dqn(0,state,0), cell(R1, C1, 1), cell(R2, C2, 6), R1 = R2, C1 + 1 = C2.
-#
-# :- dqn(0,state,2), cell(R1, C1, 1), cell(R2, C2, 3), R1 = R2, C1 + 7 = C2.
-# :- dqn(0,state,2), cell(R1, C1, 1), cell(R2, C2, 4), R1 + 1 = R2, C1 + 7 = C2.
-#
-# :- dqn(0,state,4).
-# '''
-
-
 dprogram = '''
 nn(dqn(1,state),[0,1,2,3,4]). 
 

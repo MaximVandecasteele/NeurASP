@@ -1,121 +1,45 @@
 #Code modified from [on the Paperspace blog](https://blog.paperspace.com/building-double-deep-q-network-super-mario-bros/).
-
+#  https://github.com/Montyro/MarioSSRL
 ## Install the following if on a new instance, otherwise they'll ship with the container.
 # !pip install nes-py==0.2.6
 # !pip install gym-super-mario-bros
 # !apt-get update
 # !apt-get install ffmpeg libsm6 libxext6  -y
 
-import csv
-from ast import parse
-from turtle import back
 import torch
-import torch.nn as nn
-import random
 import gym_super_mario_bros
 from nes_py.wrappers import JoypadSpace
-from torch.serialization import save
-from tqdm import tqdm
-import pickle 
 
 from gym_super_mario_bros.actions import RIGHT_ONLY
-
-import gym
+from tqdm import tqdm
 import numpy as np
-import collections 
 import cv2
-import matplotlib.pyplot as plt
-from IPython import display
 from symbolic_components.Advisor import Advisor
-from gym_wrappers import MaxAndSkipEnv, ProcessFrame, ImageToPyTorch, ScaledFloatFrame, BufferWrapper
-from DQN_network_vanilla import DQNSolver
+from Environment.gym_wrappers import make_env
 from DQNAgent import DQNAgent
+from Configuration.config import config_player, config
 
-
-# Argparse
-
-import argparse
-import os
-
-config = {
-    'vis': True,
-    'level': '1-1',
-    # asp or rgb
-    'input_type': 'asp',
-    'inference_type': 'pure',
-    'train': True,
-    'exp_r': 0.02,
-    'num_runs': 5,
-    'epochs': 100,
-    'working_dir': '/Users/maximvandecasteele/PycharmProjects/NeurASP/NeurASP/models/asp_ddqn_advisor/run1/',
-    # 4 werkte heel goed
-    'model': '100best_performer_dq1.pt',
-    'pretrained_weights': True,
-    'load_experience_replay': False,
-    'save_experience_replay': False,
-}
 asp = False
-if config['input_type'] == 'asp':
+if config_player['input_type'] == 'asp':
     asp = True
 
-
-
-
 ### Run settings.
-training = config['train']
-vis = config['vis']
-level = config['level']
-inference_type = config['inference_type']
+training = config_player['train']
+vis = config_player['vis']
+level = config_player['level']
+inference_type = config_player['inference_type']
 
-input_type = config['input_type']
+input_type = config_player['input_type']
 
-exp_rate = config['exp_r']
+exp_rate = config_player['exp_r']
 
-epochs = config['epochs']
+epochs = config_player['epochs']
 
 #Model loading
-savepath = config['working_dir']
+savepath = config_player['working_dir']
 
-pretrained_weights = config['pretrained_weights']
+pretrained_weights = config_player['pretrained_weights']
 
-
-
-
-# ##### Setting up Mario environment #########
-#Create environment (wrap it in all wrappers)
-def make_env(env):
-    env = MaxAndSkipEnv(env)
-    #print(env.observation_space.shape)
-    env = ProcessFrame(input_type, env)
-    #print(env.observation_space.shape)
-
-    env = ImageToPyTorch(env)
-    #print(env.observation_space.shape)
-
-    env = BufferWrapper(env, 6)
-    #print(env.observation_space.shape)
-
-    env = ScaledFloatFrame(env)
-    #print(env.observation_space.shape)
-
-    return JoypadSpace(env, RIGHT_ONLY) #Fixes action sets
-
-def make_asp_env(env):
-    env = MaxAndSkipEnv(env)
-    #print(env.observation_space.shape)
-    env = ProcessFrame(input_type, env)
-    #print(env.observation_space.shape)
-
-    env = ImageToPyTorch(env)
-    #print(env.observation_space.shape)
-
-    env = BufferWrapper(env, 6)
-    #print(env.observation_space.shape)
-
-    env = ScaledFloatFrame(env)
-    #print(env.observation_space.shape)
-
-    return JoypadSpace(env, RIGHT_ONLY) #Fixes action sets
 
 def vectorize_action(action, action_space):
     # Given a scalar action, return a one-hot encoded action
@@ -132,7 +56,7 @@ def recover_asp_facts(tensor):
     for i in range (tensor.shape[0]):
         for j in range(tensor.shape[1]):
             if tensor[i][j] != 0:
-                facts.append(f'cell({i},{j},{int(round(float(tensor[i][j]*255*6/255), 0))}).')
+                facts.append(f'cell({i},{j},{int(round(float(tensor[i][j]*255*7/255), 0))}).')
     facts = ' '.join(facts)
     return facts
 
@@ -144,25 +68,14 @@ def run(asp, pretrained):
     previous_x = 0
     perform_no_op = False
 
-    config2 = {
-            'game_rules': '/Users/maximvandecasteele/PycharmProjects/NeurASP/RL/asp/game_rules_balanced_for_advisor.lp',
-            'show_constraints': '/Users/maximvandecasteele/PycharmProjects/NeurASP/RL/asp/show_constraints.lp',
-            'show_airborne': '/Users/maximvandecasteele/PycharmProjects/NeurASP/RL/asp/show_airborne.lp',
-        }
-
-    advisor = Advisor(config2)
-
+    advisor = Advisor(config)
 
     env = gym_super_mario_bros.make('SuperMarioBros-'+level+'-v0') #Load level
-
-    if asp:
-        env = make_asp_env(env) # Wraps the environment so that frames are 15x16 ASP frames
-    else:
-        env = make_env(env)  # Wraps the environment so that frames are grayscale / segmented
+    env = make_env(env, input_type) # Wraps the environment so that frames are grayscale / segmented
 
     observation_space = env.observation_space.shape
     action_space = env.action_space.n
-    pretrained_model_name = config['model']
+    pretrained_model_name = config_player['model']
     agent = DQNAgent(state_space=observation_space,
                      action_space=action_space,
                      max_memory_size=4000,
@@ -182,8 +95,10 @@ def run(asp, pretrained):
     #Reset environment
     env.reset()
 
+
     #Each iteration is an episode (epoch)
-    for ep_num in range(epochs):
+    for ep_num in epochs:
+
 
         counter = 0
         #Reset state and convert to tensor
@@ -250,13 +165,10 @@ def run(asp, pretrained):
             state = state_next
             #Write to tensorboard Reward and position
             if terminal == True:
-                print('dead')
+
                 break #End episode loop
 
-
-    
     env.close()
-
 
 
 if __name__ == '__main__':

@@ -17,6 +17,7 @@ class ActionDecider:
         self.show = f.read()
         f.close()
 
+    #     Decide what actions are worth taking in the current situation.
     def decide(self, current_facts):
 
         # pass to solver.

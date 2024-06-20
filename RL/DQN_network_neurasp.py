@@ -21,7 +21,6 @@ class DQNSolver_neurasp(nn.Module):
             nn.Linear(conv_out_size, 512),
             nn.ReLU(),
             nn.Linear(512, n_actions),
-            # only for neurasp purposes, otherwise comment out the softmax
             nn.Softmax(dim=0)
         )
 

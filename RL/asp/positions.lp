@@ -1,4 +1,4 @@
-% mario = 1, platform = 2, enemy = 3, hole = 4, pipe = 5, wall = 6. 
+% mario = 1, platform = 2, enemy = 3, hole = 4, pipe = 5, wall = 6, plant = 7.
 
 
 
@@ -6,7 +6,7 @@ enemy(XMIN, XMAX, YMIN, YMAX) :- goomba(XMIN,XMAX,YMIN,YMAX).
 enemy(XMIN, XMAX, YMIN, YMAX) :- koopa_troopa(XMIN,XMAX,YMIN,YMAX).
 enemy(XMIN, XMAX, YMIN, YMAX) :- koopa_paratroopa(XMIN,XMAX,YMIN,YMAX).
 enemy(XMIN, XMAX, YMIN, YMAX) :- shield(XMIN,XMAX,YMIN,YMAX).
-enemy(XMIN, XMAX, YMIN, YMAX) :- piranha_plant(XMIN,XMAX,YMIN,YMAX).
+plant(XMIN, XMAX, YMIN, YMAX) :- piranha_plant(XMIN,XMAX,YMIN,YMAX).
 
 platform(XMIN, XMAX, YMIN, YMAX) :- brick(XMIN,XMAX,YMIN,YMAX).
 platform(XMIN, XMAX, YMIN, YMAX) :- ground(XMIN,XMAX,YMIN,YMAX).
@@ -61,6 +61,7 @@ adjacent(ground(XMIN1,XMAX1,YMIN1,YMAX1), ground(XMIN2,XMAX2,YMIN2,YMAX2)) :- gr
 % convert to categorical cell representation
 object(1, (XMIN + XMAX) / 2, (YMIN + YMAX) /2) :- mario(XMIN,XMAX,YMIN,YMAX).
 object(3, (XMIN + XMAX) / 2, (YMIN + YMAX) /2) :- enemy(XMIN,XMAX,YMIN,YMAX).
+object(7, (XMIN + XMAX) / 2, (YMIN + YMAX) /2) :- plant(XMIN,XMAX,YMIN,YMAX).
 
 %we do not need the bottom row as this only contains ground that can never be touched
 center_cell(R,C, (C * 16) + 8, (R * 16) + 8) :- R = 0..13, C = 0..15.
@@ -102,11 +103,4 @@ cell(R,C,4) :- hole(XMIN,XMAX,YMIN,YMAX), center_cell(R,C,XC,YC), XC >= XMIN, XC
 cell(R,C,5) :- pipe(XMIN,XMAX,YMIN,YMAX), center_cell(R,C,XC,YC), XC >= XMIN, XC <= XMAX, YC <= YMAX, YC >= YMIN.
 
 cell(R,C,6) :- wall(XMIN,XMAX,YMIN,YMAX), center_cell(R,C,XC,YC), XC >= XMIN, XC <= XMAX, YC <= YMAX, YC >= YMIN.
-
-
-%mario(115,132,180,197).
-%ground(0,254,207,240).
-%goomba(232,249,192,208).
-%pipe(251,255,143,206).
-
 

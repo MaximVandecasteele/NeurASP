@@ -7,52 +7,24 @@
 # !apt-get install ffmpeg libsm6 libxext6  -y
 
 import csv
-from ast import parse
-from turtle import back
 import torch
-import torch.nn as nn
-import random
 import gym_super_mario_bros
 from nes_py.wrappers import JoypadSpace
-from torch.serialization import save
-from tqdm import tqdm
-import pickle 
 
 from gym_super_mario_bros.actions import RIGHT_ONLY
 
-import gym
 import numpy as np
-import collections 
 import cv2
-import matplotlib.pyplot as plt
-from IPython import display
-from RL.gym_wrappers import MaxAndSkipEnv, ProcessFrame, ImageToPyTorch, ScaledFloatFrame, BufferWrapper
-from RL.DQN_network_vanilla import DQNSolver
+from Environment.gym_wrappers import MaxAndSkipEnv, ProcessFrame, ImageToPyTorch, ScaledFloatFrame, BufferWrapper
 from RL.DQNAgent import DQNAgent
-
+from Configuration.config import config_evaluation
+from Environment.gym_wrappers import make_env
 
 # Argparse
 
-import argparse
 import os
 
-config = {
-    'vis': False,
-    'level': '1-1',
-    'tensorboard' : True,
-    # asp or rgb
-    'input_type': 'asp',
-    'inference_type': 'pure',
-    'train': False,
-    'max_exp_r': 1.0,
-    'min_exp_r': 0.02,
-    'num_runs': 5,
-    'epochs': 100,
-    'working_dir': '/Users/maximvandecasteele/PycharmProjects/NeurASP/NeurASP/models/test/',
-    'pretrained_weights': True,
-    'load_experience_replay': False,
-    'save_experience_replay': False,
-}
+config = config_evaluation
 
 asp = False
 if config['input_type'] == 'asp':
@@ -73,16 +45,12 @@ if use_tensorboard:
 
 input_type = config['input_type']
 
-##Training settings:
-if training ==  False:
-    if inference_type == 'pure':
-        max_exploration_rate = 0.02
-        min_exploration_rate = 0.02
-    else:
-        max_exploration_rate = min_exp_r
-        min_exploration_rate = min_exp_r
+
+if inference_type == 'pure':
+    max_exploration_rate = 0.02
+    min_exploration_rate = 0.02
 else:
-    max_exploration_rate = max_exp_r
+    max_exploration_rate = min_exp_r
     min_exploration_rate = min_exp_r
 
 epochs = config['epochs']
@@ -97,43 +65,6 @@ pretrained_weights = config['pretrained_weights']
 load_exp_rep = config['load_experience_replay']
 save_exp_rep = config['save_experience_replay']
 
-
-# ##### Setting up Mario environment #########
-#Create environment (wrap it in all wrappers)
-def make_env(env):
-    env = MaxAndSkipEnv(env)
-    #print(env.observation_space.shape)
-    env = ProcessFrame(input_type, env)
-    #print(env.observation_space.shape)
-
-    env = ImageToPyTorch(env)
-    #print(env.observation_space.shape)
-
-    env = BufferWrapper(env, 6)
-    #print(env.observation_space.shape)
-
-    env = ScaledFloatFrame(env)
-    #print(env.observation_space.shape)
-
-    return JoypadSpace(env, RIGHT_ONLY) #Fixes action sets
-
-def make_asp_env(env):
-    env = MaxAndSkipEnv(env)
-    #print(env.observation_space.shape)
-    env = ProcessFrame(input_type, env)
-    #print(env.observation_space.shape)
-
-    env = ImageToPyTorch(env)
-    #print(env.observation_space.shape)
-
-    env = BufferWrapper(env, 6)
-    #print(env.observation_space.shape)
-
-    env = ScaledFloatFrame(env)
-    #print(env.observation_space.shape)
-
-    return JoypadSpace(env, RIGHT_ONLY) #Fixes action sets
-
 def vectorize_action(action, action_space):
     # Given a scalar action, return a one-hot encoded action
     return [0 for _ in range(action)] + [1] + [0 for _ in range(action + 1, action_space)]
@@ -143,18 +74,11 @@ def show_state(env, ep=0, info=""):
     cv2.imshow("Output!",env.render(mode='rgb_array')[:,:,::-1]) #Display using opencv
     cv2.waitKey(1)
 
-
-
-
-
 def run(asp, pretrained):
    
     env = gym_super_mario_bros.make('SuperMarioBros-'+level+'-v0') #Load level
 
-    if asp:
-        env = make_asp_env(env) # Wraps the environment so that frames are 15x16 ASP frames
-    else:
-        env = make_env(env)  # Wraps the environment so that frames are grayscale / segmented
+    env = make_env(env, input_type)  # Wraps the environment so that frames are grayscale / segmented
 
     observation_space = env.observation_space.shape
     action_space = env.action_space.n

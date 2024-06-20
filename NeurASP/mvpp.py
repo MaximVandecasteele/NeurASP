@@ -8,6 +8,8 @@ import time
 from clingo.control import Control
 import numpy as np
 
+# https://github.com/azreasoners/NeurASP
+
 class MVPP(object):
     def __init__(self, program, k=1, eps=0.000001):
         self.k = k

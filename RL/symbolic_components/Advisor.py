@@ -20,11 +20,6 @@ class Advisor():
 
         self.on_ground = True
 
-
-
-
-
-
     def advise(self, action, facts, on_ground):
         perform_No_Op = False
         advice_given = False
@@ -45,33 +40,17 @@ class Advisor():
         if perform_No_Op == True and (2 or 4 in values):
             action = 0
             advice_given = True
+        elif 0 in values:
+            action = 0
+            advice_given = True
+        elif 1 in values:
+            action = 0
+            advice_given = True
         elif 2 in values:
             action = 2
             advice_given = True
 
-
-        perform_No_Op = False
         self.memory = on_ground
-
-
-
-        # if self.on_ground and (2 in values or 4 in values):
-        #     action = 2
-        #     self.on_ground = False
-        #     advice_given = True
-        # elif (not self.on_ground) and 8 in values and (2 in values or 4 in values):
-        #     action = 0
-        #     self.on_ground = True
-        #     advice_given = True
-        # elif (not self.on_ground) and 8 in values:
-        #     self.on_ground = True
-        #     advice_given = True
-        # elif (not self.on_ground) and (2 in values or 4 in values):
-        #     action = 2
-        #     advice_given = True
-
-
-
             # advice_given = True
         return action, advice_given
 
